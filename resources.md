@@ -1,10 +1,10 @@
 ---
 layout: page
-title: Resources
+title: General Resources
 nav_order: 6
 ---
 
-# Resources 
+# General Resources 
 {:.no_toc}
 
 ## Table of contents
@@ -16,6 +16,8 @@ nav_order: 6
 ---
 
 ## GIS and Data Management
+
+## Geospatial Data Analysis Software
 
 ## GIS Data Sources
 

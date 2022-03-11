@@ -18,3 +18,17 @@ nav_order: 4
 ## Introduction
 
 ## Readings
+\
+*Required Readings*
+
+*Optional Readings*
+
+## Class notes
+
+A link to the class notes will be available here soon after the class session. 
+
+## Useful resources
+
+## Assignment
+
+
