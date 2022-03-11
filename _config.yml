@@ -28,7 +28,7 @@ search_enabled: true
 heading_anchors: true
 permalink: pretty
 aux_links:
-  Course Website on GitHub:
+  Course Repository on GitHub:
     - 'https://github.com/aranganath24/ARSC5040_GIS'
 footer_content:
 
