@@ -29,7 +29,7 @@ heading_anchors: true
 permalink: pretty
 aux_links:
   Course Website on GitHub:
-    - 'https://aranganath24.github.io/ARSC5040_GIS/'
+    - 'https://github.com/aranganath24/ARSC5040_GIS'
 footer_content:
 
 # Collections for website data
