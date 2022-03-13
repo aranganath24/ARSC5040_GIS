@@ -19,6 +19,10 @@ nav_order: 6
 
 ## Geospatial Data Analysis Software
 
+## Importing GIS data
+
+[reading data](general_resources/reading_data.html)
+
 ## GIS Data Sources
 
 ### Source 1
