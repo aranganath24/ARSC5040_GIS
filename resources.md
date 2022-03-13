@@ -21,8 +21,10 @@ nav_order: 6
 
 ## Importing GIS data
 
-[reading data](general_resources/reading_data.html)
+[Primer on reading data](general_resources/reading_data.html)
 
 ## GIS Data Sources
 
 ### Source 1
+
+### Source 2 
