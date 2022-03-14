@@ -25,6 +25,28 @@ nav_order: 6
 
 ## GIS Data Sources
 
+[OSM](general_resources/packages/osm.html)
+
+[boundaries](general_resources/packages/administrative_boundaries.html)
+
+gadm boundaries
+
+rnatural earth
+
+worldpop
+
+aiddata: [https://github.com/felixhaass/aiddata](https://github.com/felixhaass/aiddata)
+
+tidycensus
+
+gred
+
+prio grid
+
+worldbank
+
+
+
 ### Source 1
 
 ### Source 2 
