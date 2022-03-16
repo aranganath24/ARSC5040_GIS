@@ -29,9 +29,8 @@ nav_order: 6
 
 [boundaries](general_resources/packages/administrative_boundaries.html)
 
-gadm boundaries
+[elevation](general_resources/packages/elevatr2.html) 
 
-rnatural earth
 
 worldpop
 

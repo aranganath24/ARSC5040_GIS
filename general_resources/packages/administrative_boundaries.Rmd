@@ -1,8 +1,13 @@
 ---
-title: "Administrative Boundary Data"
+title: "Country and Subnational Administrative Boundary Data"
 author: "Aditya Ranganath"
 date: "3/13/2022"
-output: html_document
+output: 
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+    number_sections: TRUE
 ---
 
 ```{r setup, include=FALSE}
@@ -21,7 +26,7 @@ library(tidyverse)
 ```
 
 
-## Extracting country polygons
+# Extracting country polygons
 
 ```{r}
 country_boundaries<-ne_countries(scale="medium", returnclass="sf")
@@ -35,7 +40,7 @@ world_map<-tm_shape(country_boundaries)+
 world_map
 ```
 
-### Filter out a country using dplyr
+## Filter out a country using dplyr
 
 ```{r}
 india<-country_boundaries %>% filter(iso_a3=="IND")
@@ -48,7 +53,7 @@ india_map<-tm_shape(india)+
 india_map
 ```
 
-### Filter out multiple countries using dplyr
+## Filter out multiple countries using dplyr
 
 ```{r}
 usa_can_mexico<-country_boundaries %>% 
@@ -75,7 +80,7 @@ namerica_bb<-st_bbox(c(xmin=-178.19453, xmax=-52.65366, ymax=83.15, ymin=14.5454
 tm_shape(usa_can_mexico, bbox=namerica_bb)+tm_polygons()
 ```
 
-## Extracting subnational administrative boundaries
+# Extracting subnational administrative boundaries
 
 ## Extracting subnational boundaries for one country
 
@@ -131,7 +136,7 @@ france_germany_map<-tm_shape(france_germany)+
 france_germany_map
 ```
 
-## USA boundaries
+# USA subnational boundaries
 
 ```{r, message=F, warning=F, results=F}
 state_population_2010<-get_decennial(geography = "state", 
@@ -203,8 +208,23 @@ tm_shape(co_wy_ut)+
   tm_polygons()
 ```
 
+```{r}
+state_selection<-state_population_2010_shifted %>% 
+                    filter(NAME=="Colorado"|NAME=="Wyoming"|NAME=="Utah")
+```
 
-https://stackoverflow.com/questions/61068746/r-tmap-add-thick-border-and-transform-counties-with-nas-to-diagonal-stripes
+```{r}
+state_selection
+```
+
+
+```{r}
+tm_shape(co_wy_ut)+
+  tm_polygons()+
+tm_shape(state_selection)+
+  tm_borders(lwd=8, lty="solid")
+
+```
 
 
 

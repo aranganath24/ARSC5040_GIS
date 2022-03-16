@@ -80,3 +80,22 @@ tm_shape(co_wy_ut)+
   tm_polygons()
 
 
+
+
+
+co_selection<-state_population_2010_shifted %>% 
+  filter(NAME=="Colorado")
+
+wy_selection<-state_population_2010_shifted %>% 
+  filter(NAME=="Wyoming")
+
+ut_selection<-state_population_2010_shifted %>% 
+  filter(NAME=="Utah")
+
+tm_shape(co_selection)+
+  tm_borders(lwd=8, lty="solid")+
+tm_shape(wy_selection)+
+  tm_borders(lwd=8, lty="solid")+
+tm_shape(ut_selection)+
+  tm_borders(lwd=9, lty="solid")
+
