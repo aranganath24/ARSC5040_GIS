@@ -31,6 +31,7 @@ nav_order: 6
 
 [elevation](general_resources/packages/elevatr2.html) 
 
+[precipitation, humidity, temperature](general_resources/packages/precipitation.html)
 
 worldpop
 

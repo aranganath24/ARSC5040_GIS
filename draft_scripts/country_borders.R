@@ -79,6 +79,15 @@ co_wy_ut<-bind_rows(state_list)
 tm_shape(co_wy_ut)+
   tm_polygons()
 
+tm_shape(mountain_lion_locations)+
+  tm_dots()+
+  tm_shape(country_boundaries)+
+  tm_polygons()
+
+tm_shape(country_boundaries)+
+  tm_polygons()+
+tm_shape(mountain_lion_locations)+
+  tm_dots()
 
 
 

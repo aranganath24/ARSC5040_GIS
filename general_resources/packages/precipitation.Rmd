@@ -1,0 +1,51 @@
+---
+title: "Extract Precipitation, Temperature, and Humidity using nasapower "
+author: "Aditya Ranganath"
+date: "3/16/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(sf)
+library(tmap)
+library(tidyverse)
+library(tidycensus)
+library(nasapower)
+library(DT) 
+```
+
+
+# Extracting data at a point
+
+
+```{r}
+daily_single_ag <- get_power(
+    community = "ag",
+    lonlat = c(151.81, -27.48),
+    pars = c("RH2M", "T2M", "PRECTOTCORR"),
+    dates = c("1985-01-01", "1985-01-31"),
+    temporal_api = "daily"
+)
+```
+
+```{r}
+daily_single_ag %>% datatable(extensions=c("Scroller", "FixedColumns")) 
+```
+
+
+```{r}
+daily_single_ag %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+)) 
+```
+
+
