@@ -2,7 +2,12 @@
 title: "Extract Precipitation, Temperature, and Humidity using nasapower "
 author: "Aditya Ranganath"
 date: "3/16/2022"
-output: html_document
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+    number_sections: TRUE
 ---
 
 ```{r setup, include=FALSE}
@@ -15,6 +20,10 @@ library(tmap)
 library(tidyverse)
 library(tidycensus)
 library(nasapower)
+library(raster)
+```
+
+```{r, echo=F, warnin=F}
 library(DT) 
 ```
 
@@ -196,7 +205,7 @@ central_co_precipitation_2011_2012_monthly %>% datatable(extensions=c("Scroller"
 
 ```{r}
 central_co_precipitation_2011_2012_monthly_locations<-
- st_as_sf(central_co_precipitation_2011_2012_monthly, coords=c("LON", "LAT"), crs=4326)
+ st_as_sf(central_co_precipitation_2011_2012_monthly, coords=c("LON", "LAT"), crs=4326, remove=F)
 ```
 
 ```{r}
@@ -206,10 +215,50 @@ tm_shape(central_co_precipitation_2011_2012_monthly_locations)+
   tm_dots()
 ```
 
+```{r}
+central_co_precipitation_2011<-central_co_precipitation_2011_2012_monthly_locations %>% 
+                                  filter(YEAR==2011) %>% 
+                                  filter(ANN>=1.5)
+
+```
+
+```{r}
+tm_shape(colorado_polygon)+
+  tm_polygons()+
+tm_shape(central_co_precipitation_2011_2012_monthly_locations)+
+  tm_dots(size=0.1)+
+tm_shape(central_co_precipitation_2011)+
+  tm_dots("green", size=0.1)
+```
+
+```{r}
+precipitation_annual_2011<-central_co_precipitation_2011_2012_monthly %>% 
+                           filter(YEAR==2011)
+```
 
 
+```{r}
+rainfall_raster<-rasterFromXYZ(precipitation_annual_2011[, c("LON", "LAT", "ANN")])
+```
 
 
+```{r}
+tm_shape(rainfall_raster)+
+  tm_raster(title="Annual Precipitation, 2011")+
+  tm_legend(outside=T)
+```
 
+```{r}
+rainfall_raster_map<-tm_shape(rainfall_raster)+
+                      tm_raster(title="Annual Precipitation, 2011")+
+                      tm_legend(outside=T)
+```
 
+```{r}
+tm_shape(colorado_polygon)+
+  tm_polygons()+
+  rainfall_raster_map+
+  tm_shape(central_co_counties)+
+    tm_polygons(alpha=0)
 
+```
