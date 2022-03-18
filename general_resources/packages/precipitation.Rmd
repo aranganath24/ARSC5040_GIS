@@ -262,3 +262,6 @@ tm_shape(colorado_polygon)+
     tm_polygons(alpha=0)
 
 ```
+
+
+<div class="tocify-extend-page" data-unique="tocify-extend-page" style="height: 0;"></div>
