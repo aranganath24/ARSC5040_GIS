@@ -33,6 +33,8 @@ nav_order: 6
 
 [precipitation, humidity, temperature](general_resources/packages/precipitation.html)
 
+[land cover and vegetation](general_resources/packages/MODIStsp.html)
+
 worldpop
 
 aiddata: [https://github.com/felixhaass/aiddata](https://github.com/felixhaass/aiddata)
