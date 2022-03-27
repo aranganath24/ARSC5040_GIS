@@ -30,6 +30,7 @@ library(DT)
 
 # World Map
 
+## Load and view country boundaries 
 ```{r}
 country_boundaries<-ne_countries(scale="medium", returnclass="sf")
 ```
@@ -38,6 +39,8 @@ country_boundaries<-ne_countries(scale="medium", returnclass="sf")
 tm_shape(country_boundaries)+
   tm_polygons()
 ```
+
+## View and extract WDI codes
 
 ```{r}
 WDI_variables<-WDIsearch()
@@ -61,6 +64,8 @@ WDI_variables %>% datatable(extensions=c("Scroller", "FixedColumns"), options = 
 ```{r}
 trade_gdp_string<-"NE.TRD.GNFS.ZS"
 ```
+
+## Extract WDI data
 
 ```{r}
 trade_gdp_2010_2018<-WDI(country="all",
@@ -89,6 +94,8 @@ trade_gdp_2015 %>% datatable(extensions=c("Scroller", "FixedColumns"), options =
   fixedColumns = list(leftColumns = 3)
 ))
 ```
+
+## Join WDI data to spatial dataset
 
 ```{r}
 trade_2015_spatial<-full_join(country_boundaries, trade_gdp_2015,
@@ -120,12 +127,14 @@ trade_2015_spatial<-trade_2015_spatial %>%
                       rename(trade_pct_gdp=NE.TRD.GNFS.ZS)
 ```
 
+## Make map of WDI data
 
 ```{r}
 tm_shape(trade_2015_spatial)+
   tm_polygons(col="trade_pct_gdp", palette="YlOrRd", style="jenks",
               n=5)
 ```
+## Make map with inset map
 
 ```{r}
 unique(trade_2015_spatial$subregion)
@@ -160,6 +169,42 @@ x<-tm_shape(trade_2015_spatial)+
 x
 print(y, vp = viewport(0.8, 0.18, width = 0.3, height = 0.3))
 ```
+## Map change over time
+
+```{r}
+trade_gdp_2010_2015<-trade_gdp_2010_2018 %>% 
+                      filter(year=="2010"|year=="2015")
+```
+
+
+```{r}
+trade_gdp_2010_2015_wide<-trade_gdp_2010_2015 %>% 
+                          pivot_wider(names_from=year, values_from=c(NE.TRD.GNFS.ZS))
+```
+
+```{r}
+trade_gdp_2010_2015_wide<-trade_gdp_2010_2015_wide %>% 
+                            rename("trade_gdp_2015"="2015") %>% 
+                            rename("trade_gdp_2010"="2010")
+```
+
+
+```{r}
+trade_gdp_2010_2015_wide<-trade_gdp_2010_2015_wide %>% 
+                          mutate("2015_2010_pctpt_difference"=(trade_gdp_2015-trade_gdp_2010))
+```
+
+```{r}
+trade_gdp_2010_2015_wide_spatial<-full_join(country_boundaries, trade_gdp_2010_2015_wide,
+                                    by=c("iso_a3"="iso3c"))
+```
+
+```{r}
+tm_shape(trade_gdp_2010_2015_wide_spatial)+
+  tm_polygons(col="2015_2010_pctpt_difference", palette="Greens", style="jenks",
+              n=5, midpoint=T)
+```
+
 
 
 https://ecodiv.earth/post/creating-a-map-with-inset-using-tmap/
