@@ -4,7 +4,7 @@ title: Class One
 nav_order: 1
 ---
 
-# Class One: Spatial thinking and Cartography
+# Class One: Basic concepts; spatial thinking; cartography
 {:.no_toc}
 
 ## Table of contents

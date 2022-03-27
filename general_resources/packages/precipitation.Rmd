@@ -23,7 +23,7 @@ library(nasapower)
 library(raster)
 ```
 
-```{r, echo=F, warnin=F}
+```{r, echo=F, warning=F}
 library(DT) 
 ```
 

@@ -1,0 +1,179 @@
+---
+title: "Choropleth Maps in R Studio"
+author: "Aditya Ranganath"
+date: "3/26/2022"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+    number_sections: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=F, warning=F}
+library(WDI)
+library(sf)
+library(tmap)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(tidyverse)
+library(grid)
+```
+
+```{r, echo=F, warning=F, message=F}
+library(DT) 
+```
+
+# World Map
+
+```{r}
+country_boundaries<-ne_countries(scale="medium", returnclass="sf")
+```
+
+```{r}
+tm_shape(country_boundaries)+
+  tm_polygons()
+```
+
+```{r}
+WDI_variables<-WDIsearch()
+```
+
+```{r}
+View(WDI_variables)
+```
+
+```{r, ehco=F}
+WDI_variables %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+```{r}
+trade_gdp_string<-"NE.TRD.GNFS.ZS"
+```
+
+```{r}
+trade_gdp_2010_2018<-WDI(country="all",
+                                indicator=trade_gdp_string,
+                                start=2010,
+                                end=2018,
+                                extra=T)
+```
+
+```{r}
+trade_gdp_2015<-trade_gdp_2010_2018 %>% 
+                  filter(year=="2015")
+```
+
+```{r}
+View(trade_gdp_2015)
+```
+
+```{r, echo=F}
+trade_gdp_2015 %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+```{r}
+trade_2015_spatial<-full_join(country_boundaries, trade_gdp_2015,
+                                    by=c("iso_a3"="iso3c"))
+```
+
+```{r, echo=F}
+trade_2015_spatial_truncated<-trade_2015_spatial %>% 
+                               select(country, iso_a3, NE.TRD.GNFS.ZS, year, geometry)
+```
+
+```{r}
+View(trade_2015_spatial)
+```
+
+```{r, echo=F}
+trade_2015_spatial_truncated %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+```{r}
+trade_2015_spatial<-trade_2015_spatial %>% 
+                      rename(trade_pct_gdp=NE.TRD.GNFS.ZS)
+```
+
+
+```{r}
+tm_shape(trade_2015_spatial)+
+  tm_polygons(col="trade_pct_gdp", palette="YlOrRd", style="jenks",
+              n=5)
+```
+
+```{r}
+unique(trade_2015_spatial$subregion)
+```
+
+```{r}
+trade_2015_spatial_sea<-trade_2015_spatial %>% 
+                            filter(subregion=="South-Eastern Asia")
+
+y<-tm_shape(trade_2015_spatial_sea)+
+  tm_polygons(col="trade_pct_gdp", palette="YlOrRd", style="jenks",
+              n=5)
+
+y
+```
+
+```{r}
+library(grid)
+x<-tm_shape(trade_2015_spatial)+
+  tm_polygons(col="trade_pct_gdp", palette="YlOrRd", style="jenks",
+              n=5)
+x
+print(y, vp = viewport(0.8, 0.27, width = 0.5, height = 0.5))
+```
+
+
+```{r}
+library(grid)
+x<-tm_shape(trade_2015_spatial)+
+  tm_polygons(col="trade_pct_gdp", palette="YlOrRd", style="jenks",
+              n=5)
+x
+print(y, vp = viewport(0.8, 0.18, width = 0.3, height = 0.3))
+```
+
+
+https://ecodiv.earth/post/creating-a-map-with-inset-using-tmap/
+
+# Country-Level Map
+
+# USA Local Map 
+
+# Foreign Local Map 
+
+
+https://datacatalog.worldbank.org/search/dataset/0041418
+
+https://databank.worldbank.org/reports.aspx?dsid=41&series=IN.ENV.PM.CONC#
+
+
+
