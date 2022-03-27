@@ -47,6 +47,10 @@ The following is a brief outline of our five class modules. Please click on the 
 * [Week 4](class4.md) (April 21): Geospatial data ethics; Remote sensing and Google Earth Engine
 * [Week 5](class5.md) (April 28): Research Design and Wrap Up; Presentations
 
+## Readings
+
+For class-specific readings, please see the the dedicated page for the relevant class, which you can access by clicking on the tabs to the left. Please note that in some cases, optional readings are provided. In addition, during some weeks, you have considerable choice in what to read. Please read the instructions carefully, so that you can manage your time effectively. 
+
 ## Assignments
 
 There will be 3 small assignments over the course of the semester: 
@@ -63,7 +67,9 @@ Assignments are graded Pass/Fail.
 
 ## Final project
 
-In addition to the assignments, 
+In addition to the assignments, you must submit a final project, which is due by **Wednesday, May 4, at 11:59 PM**. On our final day of class (**April 28**), you will give a brief (~7 minute) "lightning talk" on your project-in-progress, which will allow us to all learn from each other (and perhaps help you identify opportunities for future collaboration). 
+
+See below for various project options. The goal of the projects is to give you an opportunity to make progress on a project that will yield some tangible benefit to you in the future (i.e. a publication, lesson plan, a dataset etc.)
 
 *Option 1: Replication Exercise*
 
@@ -75,13 +81,19 @@ Identify a research question in your area of interest that can be addressed usin
 
 *Option 3: Tutorial*
 
-Our course 
+Our course provides a very general overview of GIS and various geospatial tools, but scratches the surface of the geospatial methods that could be useful to social scientists. Identify a tool or technique that we did not cover, and write a brief tutorial about how to use it; the tutorial should be accessible to someone who has completed this mini-course. Think of this project option as an opportunity to teach yourself a method that could be useful for your research, but which we did not cover in the course. 
 
 *Option 4: Add a GIS component to an existing working paper*
 
+Many of you will have works-in-progress (either papers or thesis/dissertation chapters) that do not currently incorporate GIS, but might benefit from doing so. Take a working project, and add a GIS component to it. If your idea for how to use GIS in the working paper cannot feasibly be implemented, write up the "methods" section of the paper that describes the data and methods you will use. If the data requires an original data collection effort, please describe your strategy for collecting the data. Please submit the entire paper, with the GIS component embedded within it. 
+
 *Option 5: Create (or propose) a new dataset*
 
+While taking this course, and exploring the various geospatial datasets that are available, you may develop ideas about new datasets that could useful to your scholarly community, and which incorporate variables that are created using GIS methods or tools. Create (or, if you do not have sufficient time, propose) a novel dataset along these lines. In your writeup, how you created it (or would go about creating it, if it is a proposal), and explain what sorts of questions such a dataset could help to answer. 
+
 *Option 6: Project of your choice*
+
+You are welcome to define and create a project of your choice, if you have an idea that would not fall within these options. 
 
 ## Final Grades
 
@@ -104,4 +116,9 @@ Please note that no one is required to self-disclose their disabilities. If you 
 “All students enrolled in a University of Colorado Boulder course are responsible for knowing and adhering to the Honor Code. Violations of the policy may include: plagiarism, cheating, fabrication, lying, bribery, threat, unauthorized access to academic materials, clicker fraud, submitting the same or similar work in more than one course without permission from all course instructors involved, and aiding academic dishonesty. All incidents of academic misconduct will be reported to the Honor Code (honor@colorado.edu; 303-492-5550). Students who are found responsible for violating the academic integrity policy will be subject to nonacademic sanctions from the Honor Code as well as academic sanctions from the faculty member. Additional information regarding the Honor Code academic integrity policy can be found at the Honor Code Office website.”
 
 
-## Readings
+
+
+
+
+
+
