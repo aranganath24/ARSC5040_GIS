@@ -43,6 +43,8 @@ doi: [https://doi.org/10.1073/pnas.1917874117](https://doi.org/10.1073/pnas.1917
 * Shaver, Andrew, David B. Carter, and Tsering Wangyal Shawa. 2016. “Terrain ruggedness and land cover: Improved data for most research designs.” *Conflict Management and Peace Science* 36(2): 191-218.\
 doi: [https://doi.org/10.1177/0738894216659843](https://doi.org/10.1177/0738894216659843)
 
+* Dell, Melissa. 2010. "The Persistent Effects of Peru's Mining Mita". *Econometrica* 78(6): 1863-1903. 
+
 ## Class notes
 
 A link to the class notes will be available here soon after the class session. 

@@ -46,7 +46,7 @@ doi: [https://doi.org/10.1007/s10708-020-10285-2](https://doi.org/10.1007/s10708
 doi: [https://doi.org/10.1177/0263775815608851](https://doi.org/10.1177/0263775815608851
 )
 
-*Suggested Reading*
+*Suggested Reading*: **Google Earth Engine**
 
 * Gorelick, Noel, Matt Hancher, Mike Dixon, Simon Ilyushchenko, David Thau, and Rebecca Moore. 2017. “Google Earth Engine: Planetary-scale geospatial analysis for everyone.” *Remote Sensing of Environment* 202(1): 18-27.\
 [https://doi.org/10.1016/j.rse.2017.06.031](https://doi.org/10.1016/j.rse.2017.06.031) 

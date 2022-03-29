@@ -39,17 +39,19 @@ I am available by email, and encourage you to contact me in between classes if y
 
 ## Topics/Modules
 
-The following is a brief outline of our five class modules. Please click on the relevant link to view more details on the relevant module's dedicated page:
+The following is a brief outline of our five class modules. Please click on the relevant link below (or to the left) to view more details on the relevant module's dedicated page:
 
-* [Week 1](class1.md) (March 31): Basic concepts; spatial thinking; cartography
-* [Week 2](class2.md) (April 7): Vector data and geoprocessing
-* [Week 3](class3.md) (April 14): Raster data
-* [Week 4](class4.md) (April 21): Geospatial data ethics; Remote sensing and Google Earth Engine
-* [Week 5](class5.md) (April 28): Research Design and Wrap Up; Presentations
+* [Class One](class1.md) (March 31): Basic concepts; spatial thinking; cartography
+* [Class Two](class2.md) (April 7): Vector data and geoprocessing
+* [Class Three](class3.md) (April 14): Raster data
+* [Class Four](class4.md) (April 21): Geospatial data ethics; Remote sensing and Google Earth Engine
+* [Class Five](class5.md) (April 28): Research Design and Wrap Up; Presentations
 
 ## Readings
 
 For class-specific readings, please see the the dedicated page for the relevant class, which you can access by clicking on the tabs to the left. Please note that in some cases, optional readings are provided. In addition, during some weeks, you have considerable choice in what to read. Please read the instructions carefully, so that you can manage your time effectively. 
+
+All readings are available as PDF files at this [link](https://www.dropbox.com/sh/0a19e5h4np8pdkv/AADPipaDofb8GQsXPeQr63APa?dl=0). The password will be distributed in class; please do not share it with anyone outside the class. 
 
 ## Assignments
 
@@ -67,9 +69,11 @@ Assignments are graded Pass/Fail.
 
 ## Final project
 
-In addition to the assignments, you must submit a final project, which is due by **Wednesday, May 4, at 11:59 PM**. On our final day of class (**April 28**), you will give a brief (~7 minute) "lightning talk" on your project-in-progress, which will allow us to all learn from each other (and perhaps help you identify opportunities for future collaboration). 
+In addition to the assignments, you must submit a final project, which is due by **Wednesday, May 4, at 11:59 PM**. On our final day of class (**April 28**), you will give a brief (~7 minute) "lightning talk" on your project-in-progress, which will allow us to all learn from each other (and perhaps help you identify opportunities for future collaboration with your classmates). 
 
-See below for various project options. The goal of the projects is to give you an opportunity to make progress on a project that will yield some tangible benefit to you in the future (i.e. a publication, lesson plan, a dataset etc.)
+See below for various project options. The goal of the projects is to give you an opportunity to make progress on a project that will yield some tangible benefit to you in the future (i.e. a publication, a lesson plan, a dataset etc.). 
+
+A word of advice: The final project should be a challenging and rewarding experience, but given time constraints, it is important not to overwhelm yourself (and GIS projects have a way of quickly becoming complicated and overwhelming, even if they did not seem so at first). If you find yourself getting overwhelmed, please talk to me, and we can find a way to recast the project to keep your workload manageable. 
 
 *Option 1: Replication Exercise*
 
@@ -77,25 +81,27 @@ Identify a research paper in your field of interest that uses GIS in its empiric
 
 *Option 2: Research Proposal*
 
-Identify a research question in your area of interest that can be addressed using GIS data, and propose a research design that will allow you to answer it. In your discussion, clearly state the question, briefly discuss how other scholars have explored it in the past, and explain how the use of GIS will allow you to extend the research frontier. You should discuss data sources and your empirical strategy, but you are not required to do the actual research (but you are welcome to do so, if you wish)
+Identify a research question in your area of interest that can be addressed using GIS data, and propose a research design that will allow you to answer it. In your discussion, clearly state the question, briefly discuss how other scholars have explored it in the past, and explain how the use of GIS and spatial data will allow you to extend the research frontier. You should discuss data sources and your empirical strategy, but you are **not** required to do the actual research (but you are welcome to do so, or conduct a quick plausibility probe, if you wish!)
 
 *Option 3: Tutorial*
 
-Our course provides a very general overview of GIS and various geospatial tools, but scratches the surface of the geospatial methods that could be useful to social scientists. Identify a tool or technique that we did not cover, and write a brief tutorial about how to use it; the tutorial should be accessible to someone who has completed this mini-course. Think of this project option as an opportunity to teach yourself a method that could be useful for your research, but which we did not cover in the course. 
+Our course provides a very general overview of GIS and various geospatial tools, but scratches the surface of the many geospatial methods that could be useful to social scientists. Identify a tool or technique that we did not cover, and write a brief tutorial about how to use that tool or technique; the tutorial should be accessible to someone who has completed this mini-course. Think of this project option as an opportunity to teach yourself a method that could be useful for your research, but which we did not cover in the course (or as an opportunity to develop a lesson plan that could could enhance your teaching portfolio). 
 
 *Option 4: Add a GIS component to an existing working paper*
 
-Many of you will have works-in-progress (either papers or thesis/dissertation chapters) that do not currently incorporate GIS, but might benefit from doing so. Take a working project, and add a GIS component to it. If your idea for how to use GIS in the working paper cannot feasibly be implemented, write up the "methods" section of the paper that describes the data and methods you will use. If the data requires an original data collection effort, please describe your strategy for collecting the data. Please submit the entire paper, with the GIS component embedded within it. 
+Many of you will have works-in-progress (either papers or thesis/dissertation chapters) that do not currently incorporate GIS, but might benefit from doing so. Take a working project (it is fine for the working project to be co-authored with someone outside the class), and add a GIS component to it. If your idea for how to use GIS in the working paper cannot feasibly be implemented in the time you have available, write up the "methods" section of the paper that describes the data and methods you will use. If the data requires an original data collection effort, please describe your strategy for collecting this data. Please submit the entire paper, with the GIS component embedded within it. 
 
 *Option 5: Create (or propose) a new dataset*
 
-While taking this course, and exploring the various geospatial datasets that are available, you may develop ideas about new datasets that could useful to your scholarly community, and which incorporate variables that are created using GIS methods or tools. Create (or, if you do not have sufficient time, propose) a novel dataset along these lines. In your writeup, how you created it (or would go about creating it, if it is a proposal), and explain what sorts of questions such a dataset could help to answer. 
+While taking this course, and exploring the various geospatial datasets that are available, you may develop ideas about new datasets that could be useful to your scholarly community, and which might incorporate variables that are created using GIS methods or tools. Create (or, if you do not have sufficient time, propose) a novel dataset along these lines. In your writeup, discuss how you created it (or would go about creating it, if it is a proposal), and explain what sorts of questions such a dataset could help to answer, and how it would extend the research frontier in your field. 
 
 *Option 6: Project of your choice*
 
-You are welcome to define and create a project of your choice, if you have an idea that would not fall within these options. 
+You are welcome to define and create a project of your choice, if you have an idea that does not fall within these options. If you decide to do so, please run your idea by me beforehand. 
 
 ## Final Grades
+
+Final grades will be determined as follows. 
 
 * Assignments (30%)
 * Attendance and Class participation (30%)

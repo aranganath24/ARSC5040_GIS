@@ -9,6 +9,9 @@ seo:
 
 # ARSC 5040: GIS Methods and Tools
 
+Spring 2022, University of Colorado Boulder\
+Thursdays, 3:00-5:30 PM MST
+
 ## Instructional Staff
 
 Aditya Ranganath (he/his)\
@@ -19,13 +22,5 @@ Contact: [Aditya.Ranganath@colorado.edu](mailto:Aditya.Ranganath@colorado.edu)
 ## Website Overview
 
 This is the course website for **ARSC 5040: GIS Methods and Tools**, a 5-week "mini-course" sponsored by the [Interdisciplinary Training in the Social Sciences (ITSS)](https://www.colorado.edu/cartss/interdisciplinary-training-social-sciences-itss) program at CU-Boulder. Please navigate to the syllabus, or class-specific information and material, using the tabs on the left. 
-
-
-[Lesson One](class1.md)
-
-
-[test](test/syllabus.html)
-
-
 
 
