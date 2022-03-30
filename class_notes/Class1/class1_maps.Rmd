@@ -219,28 +219,53 @@ Now, our *tmap* code will once again yield a static representation of the spatia
 world_map_orange
 ```
 
+### Editing spatial datasets
 
+We can edit spatial datasets in R Studio with relative ease, using commonly-used R packages. Let’s say, for example, that we don’t want Antarctica to appear on our map (since Antarctica typically does not appear on political maps of the world).
 
-
-
-remove frame
-remove antarctica
-web map
-
-
-
-
-## View and extract WDI codes
+To delete Antarctica from the map, we first need to delete the row that corresponds to Antarctica in ```country_boundaries```. We can do so with the following code:
 
 ```{r}
+# Deletes Antarctica from "country_boundaries"
+country_boundaries<-country_boundaries %>% filter(iso_a3 !="ATA")
+```
+
+We can translate the code above into ordinary language as follows: “Take the existing country boundaries dataset (```country_boundaries``` to the left of the ```%>%``` and to the right of the assignment operator) and then (```%>%```, a symbol called a pipe, which is used to chain together code) select only the countries that are not Antarctica (```filter(iso_a3 !="ATA"```). Take this amended (sans Antarctica) spatial dataset, and assign it back to an object named ```country_boundaries``` (```country_boundaries<-```); this assignment effectively overwrites the previous dataset that was assigned to country_boundaries (which did include Antarctica) with the amended (sans-Antarctica) dataset.”
+
+Two things may require additional elaboration:
+
+* First is the pipe, the symbol that looks like this: ```%>%```. The pipe operator essentially takes the output of the code on its left, and then use that output as an input to the code on its right. Here, the pipe takes the ```country_boundaries``` spatial object on its left, and then feeds this data into the ```filter()``` function on its right. In other words, the pipe operator links the code on its two sides, and establishes that the data to be “filtered” within the filter function is ```country_boundaries```.
+* The ```filter()``` function is a function from the *dplyr* package that allows one to select rows from a dataset using specified criteria. In our case, we want to select all rows from the dataset that are not Antarctica. The argument passed to the filter function, ```iso_a3 !="ATA"```, is essentially saying “return any records where the”iso_a3” variable (i.e. the 3 digit ISO country code) in the attribute table is NOT equal to “ATA” (Antarctica’s code). Note that != is R syntax for “not equal to”. If we were to instead type filter(iso_a3=="ATA), the function would only select the Antarctica row from the dataset and discard everything else.
+
+Now, let's go ahead an map the revised ```country_boundaries``` object:
+
+```{r}
+tm_shape(country_boundaries)+
+  tm_polygons()
+```
+
+Notice that Antarctica is no longer mapped, since the Antarctica record is no longer in the 
+```country_boundaries``` object that contains the underlying data. 
+
+## Use the *WDI* package to extract development indicator to be mapped
+
+Now that we've loaded our spatial dataset into R Studio and become acquainted with the information it contains, let's turn to the process of extracting development indicator data using the *WDI* package. We'll extract an indicator we're interested in mapping; then, below, we'll join this indicator to our spatial dataset (```country_boundaries```) based on a common field. Once the WDI data is in our spatial dataset, we can represent country-level variation in the WDI indicator on the associated map. 
+
+Let's first get a sense of what variables are available as part of the World Bank Development Indicators data series. We can extract variables in the series, along with their associated codes, using the ```WDIsearch()``` function. Below, we don't pass any arguments to ```WDIsearch```, so it will return a table containing *all* of the variables in the development indicator data series. We'll assign this table to a new object named ```WDI_variables```:
+
+```{r}
+# Extracts variable names and codes for development indicator series, and assigns it to a new object named "WDI_variables"
 WDI_variables<-WDIsearch()
 ```
 
+Now, let's view the extracted information in the R Studio data viewer by calling the ```View()``` function:
+
 ```{r}
+# Views data assigned to "WDI_variables" in data viewer
 View(WDI_variables)
 ```
 
-```{r, ehco=F}
+```{r, echo=F, warning=F}
 WDI_variables %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
   deferRender = TRUE,
   scrollY = 350,
@@ -250,6 +275,16 @@ WDI_variables %>% datatable(extensions=c("Scroller", "FixedColumns"), options = 
   fixedColumns = list(leftColumns = 3)
 ))
 ```
+
+Now that you've extracted this table of variable names and codes, scroll through and decide which one you'd like to represent on a world map. 
+
+In 
+
+
+
+
+
+
 
 ```{r}
 trade_gdp_string<-"NE.TRD.GNFS.ZS"
