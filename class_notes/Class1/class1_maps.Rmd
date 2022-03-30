@@ -97,6 +97,8 @@ While the example above was very simple, we can assign virtually any R code, and
 
 ## Load and process the spatial dataset of country boundaries
 
+## Load the spatial dataset of country boundaries into R and assign to new object
+
 When working with spatial data in R, we will sometimes want to import data that is stored on our computer. There are several functions in the sf package that will allow us to easily import saved or downloaded spatial data into R; the most commonly used ```sf``` package function to load saved spatial vector data into R is the ```st_read()``` function. For more details, please consult the ```st_read()``` function's documentation by typing ```?st_read()```. 
 
 In our case, however, we won’t have to download and import the spatial data we need into R Studio from our computer’s local drive. That is because there are R packages that already provide this spatial data, and allow us to directly load it into memory. In particular, we’ll use the ```ne_countries()``` function of the rnaturalearth package to bring a spatial dataset of country borders into our R environment, and then assign it to an object that we will name ```country_boundaries```:
@@ -107,6 +109,8 @@ country_boundaries<-ne_countries(scale="medium", returnclass="sf")
 ```
 
 Note the two arguments we pass to the ne_countries function: the "scale" argument specifies that we want to use a medium scale when rendering the map (the other options are ‘small’ and ‘large’), while the "returnclass" argument specifies that we want the spatial dataset as an sf object. 
+
+### Explore the spatial dataset
 
 Now that we have our spatial dataset loaded into our R environment and assigned to ```country_boundaries```, let's open up this dataset and see what it looks like. The best way to view a dataset in R studio is to pass the name of the relevant object to the ```View()``` function, which will open up the dataset in R Studio's built-in data viewer.
 
@@ -140,6 +144,8 @@ country_boundaries$geometry
 ```
 
 Note that extracting the "geometry" column prints some useful metadata; it tells us that the dataset has 241 features, and that it represents spatial information as polygons (geometry type: MULTIPOLYGON). It also provides information on the datasets bounding box ("bbox") and coordinate reference system ("CRS"). We'll unpack this information a bit more next class, but for now, what is important to notice is that the "geometry" column is comprised of multiple geographic coordinates for each row; we can use this information in the “geometry” column to draw georeferenced polygons for each row in the spatial dataset, which will yield a world map! 
+
+### Use information from the "geometry" column to render a map
 
 To translate the information in the "geometry" column of the dataset into a cartographic representation, we’ll use the *tmap* package. In particular, we’ll use the ```tm_shape``` and ```tm_polygons``` functions from *tmap*, which are connected by a plus sign (+). The argument passed to the ```tm_shape``` function is the name of the object associated with the spatial dataset (```country_boundaries```, defined above). In addition, the tm_polygons function indicates that the spatial data is to be represented using polygons (as opposed to alternatives such as lines or points), and does not require any arguments (we'll add some arguments in just a bit). When we type in and run the following code from our script, the result is a map that is rendered based on the information in the “geometry” column of country_boundaries:
 
@@ -178,6 +184,38 @@ Now, whenever we want to bring up that particular map, we can simply print the n
 
 ```{r, fig.asp=0.5}
 # prints contents of "world_map_orange"
+world_map_orange
+```
+
+### Make an interactive map
+
+One of the nice things about *tmap* is that it allows us to toggle back and forth between static print maps, and dynamic interactive maps that allow users to zoom in/out, pan around, view attribute characteristics etc. All you have to do to generate an interactive map is use the ```tmap_mode()``` function to shift into "view" mode with the following:
+
+```{r}
+# set tmap mode to "view"
+tmap_mode("view")
+```
+
+Now, our *tmap* code outputs will yield a dynamic map:
+
+```{r}
+# prints contents of "world_map_orange" in "view" mode
+world_map_orange
+```
+
+This map can easily be saved as an html document, and subsequently embedded on a website. 
+
+If we want to shift back to a static map, simply switch back to "plot" mode via the same ```tmap_mode``` function:
+
+```{r}
+# set tmap mode to "plot"
+tmap_mode("plot")
+```
+
+Now, our *tmap* code will once again yield a static representation of the spatial information embedded in ```country_boundaries```:
+
+```{r, fig.asp=0.5}
+# prints contents of "world_map_orange" in print mode
 world_map_orange
 ```
 
