@@ -337,8 +337,22 @@ Joining, or “merging” datasets is a very common procedure when working with 
 How do we join different datasets together? Associating two datasets into one larger dataset that combines information from both requires the datasets to share a common field; this common field can be used to essentially “glue” the datasets together. The International Organization for Standardization provides 3-digit country codes for each of the world’s countries that can be used to uniquely identify countries when working with country-level data. Both our spatial dataset (```country_boundaries```), and our World Bank dataset (```trade_gdp_2015```), contain fields with these standardized 3-digit ISO codes (this field is labelled "iso_a3” in the spatial dataset, and “iso3c” in ```trade_gdp_2015```). We will therefore use the fields containing these 3-digit country codes to join ```trade_gdp_2015``` to ```country_boundaries```: 
 
 ```{r}
+# Joins "trade_gdp_2015" to "country_boundaries" using 3-digit ISO codes; these ISO codes are contained in a column named "iso_a3" in "country_boundaries", and "iso3c" in "trade_gdp_2015"; the product of the join is assigned to a new object that is named "trade_2015_spatial"
 trade_2015_spatial<-full_join(country_boundaries, trade_gdp_2015,
                                     by=c("iso_a3"="iso3c"))
+```
+
+In the code above, we use the ```full_join()``` function to join ```trade_gdp_2015``` to ```country_boundaries```. The full_join function keeps all rows (i.e. observations) from both datasets, even if one dataset has observations that another one does not (and vice-versa). For more information on different join options, explore the documentation by inspecting the function’s documentation ```(?full_join```). Let's unpack the code which implements the join a bit more: 
+
+* The first argument to the ```full_join()``` function is ```country_boundaries```, which is of course our spatial dataset.
+* The second argument, ```trade_gdp_2015``` is the tabular dataset containing information on trade as a percentage of GDP from the year 2015, which we extracted from the World Development indicators using the *WDI* package (i.e. the data we ultimately want to map). It’s worth noting that when we are joining a tabular dataset to a spatial dataset with a view towards displaying the information contained in th tabular data on a map, the spatial dataset should be listed before the tabular dataset. If we reverse this order (i.e. join the spatial dataset to the tabular dataset rather than the other way around), we’ll have to take some additional steps to get the joined dataset ready to map, and this is best avoided.
+* The third argument specifies the join fields, i.e. the fields within the datasets that contain the common variable that can be used to correlate the records in the two different datasets and weld them together. In our case, the join variable is of course the 3-digit ISO country code. The argument that reads ``` by=c("iso_a3"="iso3c")``` indicates that we want to join the datasets based on the set of country identifiers given by the 3-digit ISO codes; because the name of the column containing the 3-digit codes is different in the two datasets, the expression in the parentheses ```"iso_a3"="iso3c"``` simply indicates that the column named “iso_a3” (in the spatial dataset) and the column named "iso3c" (in the tabular dataset) are equivalent to each other, and are to be used as the join fields. If they didn’t have different names–for example, if the ISO codes were in a column named “iso” in both datasets–we could simply have written ```by=iso``` to specify the join column.
+* Finally, we take our newly created dataset, which adds the data we want to map our original spatial dataset (```country_boundaries```), and assign this value to a new object, named ```trade_2015_spatial```. 
+
+Let's now view ```trade_2015_spatial```:
+
+```{r}
+View(trade_2015_spatial)
 ```
 
 ```{r, echo=F}
@@ -356,6 +370,32 @@ trade_2015_spatial_relocate %>% datatable(extensions=c("Scroller", "FixedColumns
   fixedColumns = list(leftColumns = 3)
 ))
 ```
+
+Note that we now have the variable we want to map ("trade_gdp_2015") inside a spatial dataset (note the "geometry" column next to "trade_gdp_2015"), we're ready to map our WDI data. 
+
+# Displaying country-level variation in the WDI indicator on a map
+
+At this point, let's go back to the *tmap* package. Let's make the most basic possible choropleth map of the "trade_gdp_2015" variable:
+
+```{r}
+# Maps country-level variation
+tm_shape(trade_2015_spatial)+
+  tm_polygons(col="trade_gdp_2015",
+              n=8,
+              style="jenks",
+              palette="BuGn")
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
