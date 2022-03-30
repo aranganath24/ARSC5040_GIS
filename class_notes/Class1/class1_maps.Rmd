@@ -278,38 +278,46 @@ WDI_variables %>% datatable(extensions=c("Scroller", "FixedColumns"), options = 
 
 Now that you've extracted this table of variable names and codes, scroll through and decide which one you'd like to represent on a world map. 
 
-In 
-
-
-
-
-
-
-
-```{r}
-trade_gdp_string<-"NE.TRD.GNFS.ZS"
-```
-
-## Extract WDI data
+In this example, let's say we're interested in mapping trade as a percentage of GDP (i.e. the value of a country's exports + imports divided by its GDP), which is a useful summary measure that captures the importance of international trade to a country's economy. Based on the ```WDI_variables``` table we generated, we can see that the variable code for this variable is **NE.TRD.GNFS.ZS**. We'll use this variable code within the ```WDI``` function to extract the "trade as a % of GDP" indicator for a given time frame. Here, we'll specify our time frame as 2010-2018. We'll assign the extracted data to a new object named ```trade_gdp_2010_2018```:
 
 ```{r}
 trade_gdp_2010_2018<-WDI(country="all",
-                                indicator=trade_gdp_string,
+                                indicator="NE.TRD.GNFS.ZS",
                                 start=2010,
                                 end=2018,
                                 extra=T)
 ```
 
+At this point, country-level data on trade as a percentage of GDP, for each year between 2010 and 2018, has been has been extracted via the World Bank API and assigned to ```trade_gdp_2010_2018```. Let's see what the data looks like:
+
+```{r}
+View(trade_gdp_2010_2018)
+```
+
+```{r, warning=F, echo=F}
+trade_gdp_2010_2018 %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+### Filter and Rename the WDI Data
+
+We'll make use of the multiple years worth of data later, but for now, let's say we only want to map the 2015 values for our variable of interest. Let's make life easier by generating a new dataset that only contains 2015 observations; we'll also rename (using the ```rename()``` function) the awkwardly named "NE.TRD.GNFS.ZS" column (which contains our variable of interest) to "trade_pct_GDP_2015", which is slightly more descriptive. We'll assign this new dataset to an object named "trade_gdp_2015":
+
 ```{r}
 trade_gdp_2015<-trade_gdp_2010_2018 %>% 
-                  filter(year=="2015")
+                  filter(year=="2015") %>% 
+                  rename(trade_gdp_2015=NE.TRD.GNFS.ZS)
 ```
 
-```{r}
-View(trade_gdp_2015)
-```
+Let's open up the new dataset and note the changes:
 
-```{r, echo=F}
+```{r, warning=F, echo=F}
 trade_gdp_2015 %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
   deferRender = TRUE,
   scrollY = 350,
@@ -320,12 +328,37 @@ trade_gdp_2015 %>% datatable(extensions=c("Scroller", "FixedColumns"), options =
 ))
 ```
 
-## Join WDI data to spatial dataset
+# Join WDI data to spatial dataset
+
+Now that we have our spatial dataset (```country_boundaries```), and a dataset of trade as a percentage of GDP in the year 2015 (```trade_gdp_2015```), let's join the latter to the former; once we have our data of interest in a spatially explicit dataset, we will be able to visualize it on a corresponding map.
+
+Joining, or “merging” datasets is a very common procedure when working with social science data (or any data for that matter), since data is often held in many different locations, and must typically be brought together into a common dataset before it can be analyzed. 
+
+How do we join different datasets together? Associating two datasets into one larger dataset that combines information from both requires the datasets to share a common field; this common field can be used to essentially “glue” the datasets together. The International Organization for Standardization provides 3-digit country codes for each of the world’s countries that can be used to uniquely identify countries when working with country-level data. Both our spatial dataset (```country_boundaries```), and our World Bank dataset (```trade_gdp_2015```), contain fields with these standardized 3-digit ISO codes (this field is labelled "iso_a3” in the spatial dataset, and “iso3c” in ```trade_gdp_2015```). We will therefore use the fields containing these 3-digit country codes to join ```trade_gdp_2015``` to ```country_boundaries```: 
 
 ```{r}
 trade_2015_spatial<-full_join(country_boundaries, trade_gdp_2015,
                                     by=c("iso_a3"="iso3c"))
 ```
+
+```{r, echo=F}
+trade_2015_spatial_relocate<-trade_2015_spatial %>% 
+                               relocate(country, iso_a3, trade_gdp_2015, year, geometry)
+```
+
+```{r, warning=F, echo=F}
+trade_2015_spatial_relocate %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+
+
 
 ```{r, echo=F}
 trade_2015_spatial_truncated<-trade_2015_spatial %>% 
