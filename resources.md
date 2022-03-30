@@ -111,8 +111,14 @@ While extracting data using R packages is convenient (and facilitates reproducib
 
 
 
+[https://sites.google.com/site/gordoncmccord/gis?authuser=0](https://sites.google.com/site/gordoncmccord/gis?authuser=0
 
+[https://dataforgood.facebook.com/dfg/tools/high-resolution-population-density-maps](https://dataforgood.facebook.com/dfg/tools/high-resolution-population-density-maps)
 
+)
+* repositories/curated lists (including geoblacklight)
+
+* google earth engine datasets 
 
 
 

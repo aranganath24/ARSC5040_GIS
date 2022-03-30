@@ -14,7 +14,48 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Introduction
+
+In this tutorial, we'll explore how to use R Studio as a mapping application, by drawing on the *tmap* package (among other packages). In our applied example, we'll focus on taking an indicator from the [World Bank's Development Indicators](https://datatopics.worldbank.org/world-development-indicators/) (a widely used collection of cross-national time-series data on economic development), and displaying this indicator on a world map. More specifically, we will be making a choropleth map; choropleths are only one of many different kinds of maps out there, but they are widely used in the social sciences, since so much of our data is connected with enumeration units (like census tracts, counties, countries etc.). For a good primer on choropleth maps, please see this [guide](https://www.axismaps.com/guide/choropleth).
+
+In working through the example below, you will become familiar with the basic mechanics of a simple, yet fundamentally important GIS workflow: the process of joining a conventional tabular dataset (that is, a dataset without explicit spatial coordinates attached to it) to a spatial dataset (that is, an explicitly georeferenced dataset), with a view towards displaying information from the tabular dataset on the geographic boundaries delineated by the spatial dataset. 
+
+Why map the information in tabular datasets to begin with? To some extent, for the same reason we attempt to make a visualization of any kind. It can help to communicate information; it can help us identify patterns we wouldn't have otherwise noticed; and it can suggest novel hypotheses. More specifically, making a map might alert us to the spatial dimensions of the social phenomenon we are investigating, which might affect our methodological or substantive approach to a given research problem. Just as good social scientists try to contextualize their social process or outcome of interest in time, it is also important to contextualize it in space; making a map is often the first step in this process. 
+
+It is important to underscore that this tutorial is not an introduction to cartography, which is an art unto itself, and beyond our scope. However, the tutorial will show you how to customize maps in R, and you can use these skills (after reading up on cartography on your own) to make maps that conform to sound cartographic design principles. Our goal here is not to make works of art, but rather to learn how to quickly create functional and informative choropleth maps that are useful to social scientists.
+
+For more on principles of cartographic design, a good place to start is this accessible [guide](https://www.axismaps.com/guide) from Axis Maps. As you begin to make different types of maps (or more sophisticated ones, with more moving parts than a standard choropleth map), you may want to begin with these resources from Esri: [Design Principles for Cartography](https://www.esri.com/arcgis-blog/products/product/mapping/design-principles-for-cartography/) and [Make Maps People Want to Look At](https://www.esri.com/news/arcuser/0112/make-maps-people-want-to-look-at.html), both by Aileen Buckley.  
+
+# Preliminaries
+
+R is an open-source programming language for statistical computing that allows users to carry out a wide range of data analysis and visualization tasks (among other things). One of the big advantages of using R is that it has a very large user community among social scientists and statisticians, who frequently publish R packages. One might think of packages as workbooks of sorts, which contain a well-integrated set of R functions, scripts, data, and documentation; these “workbooks” are designed to facilitate certain tasks or implement given procedures. These packages are then shared with the broader community, and at this point, anyone who needs to accomplish the tasks to which the package addresses itself can use the package in the context of their own projects. The ability to use published packages considerably simplifies the work of applied social scientists using R; it means that they rarely have to write code entirely from scratch, and can build on the code that others have published in the form of packages. This allows applied researchers to focus on substantive problems, without having to get too bogged down in complicated programming tasks.
+
+In the context of this tutorial, generating choropleth maps based on the World Development Indicators (WDI) data would be relatively complex if we had to write all our code from scratch. However, because we are able to make use of mapping and visualization packages written by other researchers, the task is considerably simpler, and will not require any complicated programming.
+
+In order to process our data and make our maps, we will use a variety of packages. They are:
+
+* *WDI*: It is possible to download our WDI variable of choice directly from the World Bank's WDI [website](https://datatopics.worldbank.org/world-development-indicators/) (see the "Access Data" section), but there is an R package, entitled *WDI*, that allows users to directly query and extract WDI data without leaving R. Since this is more convenient than downloading the dataset externally and loading it into R, we will use the *WDI* package to extract the WDI series of our choice. 
+* sf*: The sf package allows us to work with spatially explicit data in R. In particular, it allows us to work with "sf" objects. "sf" stands for "simple features", and is a data structure that is able to store and display geospatial vector data. Vector data (along with raster) is one of the two main types of GIS data (along with raster data), and we'll discuss it in more detail next class. 
+* *tmap*: The *tmap* package will allow us to create and customize our map. It has become one of the major R mapping packages in use today. There are other package that facilitate mapping in R. One prominent alternative to *tmap*, which many of you may be familiar with, is *ggplot2*. However, while *tmap* uses very similar syntax to *ggplot2*, the former is a dedicated mapping package, while the latter is a more general-purpose visualization package. In my experience, *tmap* is slightly more intuitive and user-friendly, so we will use it instead of *ggplot2* in this tutorial.
+* *rnaturalearth* and *rnaturalearthdata*:  In order to visualize our data on a world map, we need a spatial dataset of the world’s country boundaries. One way to get such a dataset is to download it from a public repository, and then load it into R Studio. However, these packages allow us to load a spatial dataset of world boundaries into R Studio as sf objects without having to actually download anything, which effectively saves us a few steps in the workflow.
+* *tidyverse*: The *tidyverse* is a suite of data-science packages (*ggplot2*, mentioned above, is actually a part of the tidyverse) that provide useful functions to implement common data science/data analysis tasks. We'll use some *tidyverse* packages to clean up our data, subset data implement table joins etc. 
+* *grid*: The *grid* package allows us to customize the layout of our maps, and in particular, make inset maps (an inset map is a smaller map embedded within the frame of the main map; it can be used to contextualize a given map, or to provide a "zoomed in" view of a particularly important part of the main map, or a part of the main map that is difficult to see). 
+
+To install a package in R, pass the name of the package (within quotation marks) to the ```install.packages()``` function. For example, let's say you don't have *tmap* installed. You can install it with the following:
+
+```{r, eval=F}
+# Installs tmap packages
+install.packages("tmap")
+```
+
+A function is essentially a programming construct that takes a specified input, runs this input (called an “argument”) through a set of procedures, and returns an output. In the code block above, the name of the package we wanted to install (here, “tmap”) was enclosed within quotation marks and passed as an argument to ```install.packages```; this effectively downloaded the *tmap* package to your computer. 
+
+Repeat that process for any packages you don't have installed. 
+
+After all the packages are downloaded, we must load them into memory. We can think of the process of loading installed packages into a current R environment as analogous to opening up an application on your phone or computer after it has been installed (even after an application has been installed, you can’t use it until you open it!). To load (i.e. “open”) an R package, we pass the name of the package we want to load as an argument to the ```library()``` function. Below, we load all of the required packages into memory: 
+
 ```{r, message=F, warning=F}
+# Loads required libraries
 library(WDI)
 library(sf)
 library(tmap)
@@ -24,16 +65,82 @@ library(tidyverse)
 library(grid)
 ```
 
+At this point, the packages are loaded and ready to go! One important thing to note regarding the installation and loading of packages is that we only have to install packages once; after a package is installed, there is no need to subsequently reinstall it. However, we must load the packages we need (using the library function) every time we open a new R session. In other words, if we were to close R Studio at this point and open it up later, we would **not** need to install these packages again, but **would** need to load the packages again (3.5).
+
+Note that the codeblocks in this tutorial usually have comments, prefaced by a hash (“#”). When writing code in R (or any other command-line interface) it is good practice to preface one’s code with brief comments that describe what a block of code is doing. Writing these comments can allow someone else (or your future self) to read and quickly understand the code more easily than otherwise might be the case. The hash before the comment effectively tells R that the subsequent text is a comment, and should be ignored when running a script If one does not preface the comment with a hash, R wouldn’t know to ignore the comment, and would throw an error message.
+
 ```{r, echo=F, warning=F, message=F}
 library(DT) 
 ```
 
-# World Map
+# Load Required Data
 
-## Load and view country boundaries 
+Now that we've taken care of these preliminary steps, let's go ahead and load our data into R Studio. Below, we'll first load in a spatial dataset of world boundaries, and then read in our World Bank dataset using the *WDI* package.
+
+Before proceeding, however, it is useful to briefly consider the concept of object asssignment, which will make the subsequent sections easier to follow. Consider the following example:
+
 ```{r}
+# assign value 5 to new object named x
+x<-5
+```
+
+In the code above, we used R's assignment operator (```<-```, i.e. a left-facing arrow) to assign value 5 to an object named “x.” Now that an object named “x” has been created and assigned the value 5, printing “x” in our console (or printing “x” in our script and running it) will return the value 5:
+
+```{r}
+# Print value assigned to object "x"
+x
+```
+
+More generally, the process of assignment effectively equates the output created by the code on the right side of the assignment operator (```<-```) to an object with a name that is specified on the left side of the assignment operator. Whenever we want to look at the value assigned to an object (i.e. the output created by the code to the right side of the assignment operator), we simply print the name of the object in the R console (or print the name and run it within a script).
+
+While the example above was very simple, we can assign virtually any R code, and by extension, the data structure(s) generated by that code (such as datasets, maps, graphs) to an R object. Indeed, we’ll use the basic principle of object assignment introduced above to assign the datasets we'll import below to new objects. Note that object names are arbitrary and could be virtually anything, but it is good practice for object names to describe their contents. If this is new, it will begin to make more sense as we go. 
+
+## Load spatial dataset and assign to new object
+
+When working with spatial data in R, we will sometimes want to import data that is stored on our computer. There are several functions in the sf package that will allow us to easily import saved or downloaded spatial data into R; the most commonly used ```sf``` package function to load saved spatial vector data into R is the ```st_read()``` function. For more details, please consult the ```st_read()``` function's documentation by typing ```?st_read()```. 
+
+In our case, however, we won’t have to download and import the spatial data we need into R Studio from our computer’s local drive. That is because there are R packages that already provide this spatial data, and allow us to directly load it into memory. In particular, we’ll use the ```ne_countries()``` function of the rnaturalearth package to bring a spatial dataset of country borders into our R environment, and then assign it to an object that we will name ```country_boundaries```:
+
+```{r}
+# Brings spatial dataset of country boundaries into R environment using the rnaturalearth package, and then assigns this spatial dataset to an object named "country_boundaries"
 country_boundaries<-ne_countries(scale="medium", returnclass="sf")
 ```
+
+Note the two arguments we pass to the ne_countries function: the "scale" argument specifies that we want to use a medium scale when rendering the map (the other options are ‘small’ and ‘large’), while the "returnclass" argument specifies that we want the spatial dataset as an sf object. 
+
+Now that we have our spatial dataset loaded into our R environment and assigned to ```country_boundaries```, let's open up this dataset and see what it looks like. The best way to view a dataset in R studio is to pass the name of the relevant object to the ```View()``` function, which will open up the dataset in R Studio's built-in data viewer.
+
+```{r}
+# View "country_boundaries" data in R Studio Data Viewer
+View(country_boundaries)
+```
+
+```{r, echo=F, warning=F}
+country_boundaries_view<-country_boundaries %>% 
+                          relocate(name_long, geometry, iso_a3, featurecla, type,
+                                   region_un)
+
+country_boundaries_view %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 ```{r}
 tm_shape(country_boundaries)+

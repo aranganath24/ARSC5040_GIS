@@ -41,6 +41,8 @@ A link to the class notes will be available here soon after the class session.
 
 ## Useful resources
 
+* [Cartography Guide](https://www.axismaps.com/guide) by Axis Maps. 
+
 ## Assignment
 
 
