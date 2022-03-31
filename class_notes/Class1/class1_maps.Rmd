@@ -345,6 +345,10 @@ trade_2015_spatial<-full_join(country_boundaries, trade_gdp_2015,
                                     by=c("iso_a3"="iso3c"))
 ```
 
+```{r, echo=F}
+trade_2015_spatial<-trade_2015_spatial %>% relocate(name_long, trade_gdp_2015)
+```
+
 In the code above, we use the ```full_join()``` function to join ```trade_gdp_2015``` to ```country_boundaries```. The full_join function keeps all rows (i.e. observations) from both datasets, even if one dataset has observations that another one does not (and vice-versa). For more information on different join options, explore the documentation by inspecting the function’s documentation ```(?full_join```). Let's unpack the code which implements the join a bit more: 
 
 * The first argument to the ```full_join()``` function is ```country_boundaries```, which is of course our spatial dataset.
@@ -538,25 +542,178 @@ trade_map_2015
 
 ## Interactive choropleths
 
+Recall that we can translate our code into an interactive webmap any time, simply by switching to "view" mode. Let's see what ```trade_map_2015``` rendered as an interactive map looks like:
 
+```{r}
+# sets tmap to "view" mode
+tmap_mode("view")
+```
+
+```{r, warning=F, message=F}
+# prints "trade_map_2015" in view mode
+trade_map_2015
+```
+
+Note that *tmap* does not offer as many customization options in "view" mode, but the option to render maps as interactive html objects is a useful one to have. 
+
+Before moving on, let's switch back to "plot" mode:
+
+```{r}
+tmap_mode("plot")
+```
 
 ## Inset maps 
 
-# Extensions: generating new variables to map
+An inset map is a 
 
+```{r}
+trade_map_2015_custom_breaks<-
+tm_shape(trade_2015_spatial)+
+  tm_polygons(col="trade_gdp_2015",
+              n=7,
+              breaks=c(0, 25, 50, 75, 100, 150, 250, 400),
+              palette="YlOrBr",
+              title="Trade as a % of GDP,\n2015",
+              textNA="No Data")+
+    tm_layout(legend.outside=T,
+              legend.outside.position = "bottom",
+              main.title="Crossnational Variation in Commercial Integration, 2015",
+              main.title.size=1,
+              main.title.position="center",
+              inner.margins=c(0.06,0.10,0.10,0.08), # Sets margins to create whitespace
+              frame=FALSE,
+              attr.outside = TRUE)+ 
+   tm_credits("Map Author: Aditya Ranganath\nData Source: World Bank\nDevelopment Indicators (WDI)", position=c(0.4,0), size=0.38) 
+```
 
+```{r}
+trade_map_2015_custom_breaks
+```
 
+```{r}
+trade_2015_spatial_sea<-trade_2015_spatial %>% 
+                            filter(subregion=="South-Eastern Asia")
+```
 
+```{r}
+sea_map<-tm_shape(trade_2015_spatial_sea)+
+            tm_polygons(col="trade_gdp_2015",
+                        n=7,
+                        breaks=c(0, 25, 50, 75, 100, 150, 250, 400),
+                        palette="YlOrBr")+
+              tm_layout(legend.show=F,
+                      title="Southeast Asia",
+                      title.position=c("right", "top"),
+                      title.size=0.85)
+```
 
+```{r}
+sea_map
+```
+
+```{r, warning=F, message=F}
+trade_map_2015_custom_breaks
+print(sea_map, viewport(0.8, 0.27, width = 0.35, height = 0.35))
+```
+
+# Extensions: generating and mapping derivative variables 
+
+## Mapping change
+
+```{r}
+trade_gdp_2010_2015<-trade_gdp_2010_2018 %>% 
+                      filter(year=="2010"|year=="2015")
+```
 
 
 ```{r}
-tm_shape(trade_2015_spatial)+ # specifies spatial object
-  tm_polygons(col="trade_gdp_2015", 
-              legend.is.portrait=FALSE,
-              palette="YlOrBr",
-              style="cont")+
-    tm_layout(legend.outside=T,
-              legend.outside.position = "bottom")
+trade_gdp_2010_2015_wide<-trade_gdp_2010_2015 %>% 
+                          pivot_wider(names_from=year, values_from=c(NE.TRD.GNFS.ZS))
 ```
+
+
+```{r}
+trade_gdp_2010_2015_wide<-trade_gdp_2010_2015_wide %>% 
+                            rename("trade_gdp_2015"="2015") %>% 
+                            rename("trade_gdp_2010"="2010")
+```
+
+
+```{r}
+trade_gdp_2010_2015_wide<-
+  trade_gdp_2010_2015_wide %>% 
+   mutate("2015_2010_pctpt_difference"=(trade_gdp_2015-trade_gdp_2010))
+```
+
+```{r}
+trade_gdp_2010_2015_wide_spatial<-full_join(country_boundaries, trade_gdp_2010_2015_wide,
+                                    by=c("iso_a3"="iso3c"))
+```
+
+```{r, echo=F}
+trade_gdp_2010_2015_wide_spatial<-trade_gdp_2010_2015_wide_spatial %>% 
+                                    relocate(name_long, trade_gdp_2015, trade_gdp_2010, "2015_2010_pctpt_difference", geometry)
+```
+
+```{r}
+View(trade_gdp_2010_2015_wide_spatial)
+```
+
+```{r, echo=F, message=F, warning=F}
+trade_gdp_2010_2015_wide_spatial %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+## Mapping average values
+
+```{r}
+mean_trade<-trade_gdp_2010_2018 %>% 
+              group_by(iso3c) %>% 
+              summarize(trade_2010_2018_mean=mean(NE.TRD.GNFS.ZS, na.rm=T))
+```
+
+```{r}
+mean_trade_spatial<-full_join(country_boundaries, mean_trade,
+                                by=c("iso_a3"="iso3c"))
+```
+
+```{r, echo=F, meassage=F}
+mean_trade_spatial<-mean_trade_spatial %>% relocate(name_long, trade_2010_2018_mean, geometry)
+```
+
+```{r}
+View(mean_trade_spatial)
+```
+
+```{r, warning=F, echo=F}
+mean_trade_spatial %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+# Exporting maps
+
+```{r}
+setwd("/Users/adra7980/Documents/gis_class_scratch")
+pdf("inset.pdf")
+trade_map_2015_custom_breaks
+print(sea_map, viewport(0.8, 0.27, width = 0.35, height = 0.35))
+dev.off()
+```
+
+
+
+
+
 
