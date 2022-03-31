@@ -105,45 +105,35 @@ The [lingtypology](https://ropensci.github.io/lingtypology/) package facilitates
 
 While extracting data using R packages is convenient (and facilitates reproducibility), there are of course many datasets that do not currently have packages built around them, but which are still very useful. In these cases, you'll have to download the data from the source, and then load it into R Studio (or your GIS application of choice). Here are some useful data sources: 
 
-* ***International Development***: The [AIDDATA](https://www.aiddata.org/) project, based out of William and Mary, has archived many datasets related to foreign aid flows and projects. Many of these datasets contain spatial information. [worldpop](https://www.worldpop.org/) is a large archive of spatial datasets that focus on a variety of topics spanning "population distributions, demographics and dynamics", and economic development. It's especially useful as a repository of raster datasets that are relevant to social scientists. worldpop has an associated R package, available [here](https://github.com/wpgp/wopr), but it is still somewhat new; while the package is worth exploring, at this point, you're probably still better off exploring the website directly. 
+* ***International Development***: The [AIDDATA](https://www.aiddata.org/) project, based out of William and Mary, has archived many datasets related to foreign aid flows and projects. Many of these datasets contain spatial information. [worldpop](https://www.worldpop.org/) is a large archive of spatial datasets that focus on a variety of topics spanning "population distributions, demographics and dynamics", and economic development. It's especially useful as a repository of raster datasets that are relevant to social scientists. worldpop has an associated R package, available [here](https://github.com/wpgp/wopr), but it is still somewhat new; while the package is worth exploring, at this point, you're probably still better off exploring the website directly. Facebook's [Data for Good](https://dataforgood.facebook.com/dfg/tools) project is also a rich source of geospatial data on a variety of development-related topics (such as population, infrastructure etc.). 
 * ***International Conflict***: The Peace Research Institute Oslo ([PRIO](https://www.prio.org/)) has archived several useful datasets related to international conflict. See this [page](https://www.prio.org/Data/) for a list of datasets. Examples of GIS datasets on the page include the [PRIO Grid](https://www.prio.org/Data/), and data on [oil and gas deposits](https://www.prio.org/data/11), [diamond deposits](https://www.prio.org/data/10), [gemstone deposits](https://www.prio.org/data/25), [coca bush, opium poppy, and cannabis cultivation](https://www.prio.org/data/24). On a related note, the [Uppsala Conflict Data Program](https://ucdp.uu.se/encyclopedia) offers additional geospatial datasets on international conflict and violence; see [here](https://ucdp.uu.se/downloads/) for a list.
 * ***Economic activity and production***: For disaggregated data on economic production, William Nordhaus's [G-Econ](https://gecon.yale.edu/) project, which contains data on economic activity for "gross cell product", measured at 1-degree resolution across the world. Data is available for 1990, 1995, 2000, and 2005. For night-lights data (often used as a proxy for economic activity), see this [page](https://www.ngdc.noaa.gov/eog/download.html) from NOAA. 
+* ***Infrastructure***: See [GloBio](https://www.globio.info/download-grip-dataset) for roads data, and see this [page](https://msi.nga.mil/Publications/WPI) from the National Geospatial Intelligence Agency for data on ports. It's also worth noting that some of the best sources of infrastructure data are local municipalities. For a guide to US city data, see [here](http://us-cities.survey.okfn.org/). 
+* ***Agriculture and Environment***: We've already mentioned several environment-related datasets, as well as IPUMS, but it's worth highlighting [IPUMS Terra](https://terra.ipums.org/) if you're interested in integrating social and environmental data in a GIS framework. The [Center for Sustainability and the Global Environment](https://sage.nelson.wisc.edu/) at the University of Wisconsin-Madison, and [CIESIN](http://ciesin.columbia.edu/) at Columbia are rich sources of information and data.
+* ***Legislative Boundaries***: For those of you interested in political institutions and outcomes, the [Constituency-Level Elections Archive (CLEA)](https://electiondataarchive.org/) is worth checking out. In particular, they have georeferenced and published (as vector data files) electoral constituency boundaries for several countries around the world. See [here](https://electiondataarchive.org/data-and-documentation/georeferenced-electoral-districts-datasets/) for this district-level GIS data.
+
+## Curated GIS repositories and data sources compiled by librarians and scholars
+
+* The [Geoblacklight](https://geoblacklight.org/) project
+* A very helpful compilation of GIS data sources published by Professor Gordon McCord at UC San Diego is available [here](https://sites.google.com/site/gordoncmccord/gis?authuser=0](https://sites.google.com/site/gordoncmccord/gis?authuser=0)
+* A searchable repository of GIS data from [ArcGIS Hub](https://hub.arcgis.com/search)
+* Collections of GIS data sources compiled by librarians at [Penn](https://guides.library.upenn.edu/globalgis) and [Berkeley](https://guides.lib.berkeley.edu/gis/international)
+* Some useful [resources](https://libguides.colorado.edu/geospatialdata) from the GIS Librarian at CU Boulder. 
+
+## Google Earth Engine Data and Resources
+
+* The Google Earth Engine catalog is available [here](https://developers.google.com/earth-engine/datasets) 
+* A curated list of [awesome earth engine]([https://github.com/giswqs/Awesome-GEE) resources. 
+* A [community archive](https://github.com/samapriya/awesome-gee-community-datasets) of earth engine datasets
+
+# Tools and Packages 
+
+* [https://ropensci.org/packages/geospatial/](https://ropensci.org/packages/geospatial/)
+* [https://github.com/sacridini/Awesome-Geospatial](https://github.com/sacridini/Awesome-Geospatial) 
 
 
 
-[https://sites.google.com/site/gordoncmccord/gis?authuser=0](https://sites.google.com/site/gordoncmccord/gis?authuser=0
-
-[https://dataforgood.facebook.com/dfg/tools/high-resolution-population-density-maps](https://dataforgood.facebook.com/dfg/tools/high-resolution-population-density-maps)
-
-)
-* repositories/curated lists (including geoblacklight)
-
-* google earth engine datasets 
 
 
 
-
-
-
-[https://ropensci.org/packages/data-access/](https://ropensci.org/packages/data-access/)
-[https://ropensci.org/packages/geospatial/](https://ropensci.org/packages/geospatial/)
-
-
-
-
-
-
-gred
-
-
-
-### Tools and Packages
-
-[https://github.com/sacridini/Awesome-Geospatial](https://github.com/sacridini/Awesome-Geospatial) 
-
-Google Earth Engine Resources
-[https://github.com/giswqs/Awesome-GEE](https://github.com/giswqs/Awesome-GEE)
-
-Google Earth Engine community data archive
-[https://github.com/samapriya/awesome-gee-community-datasets](https://github.com/samapriya/awesome-gee-community-datasets)
 
