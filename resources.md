@@ -81,25 +81,16 @@ Finally, there are R packages that can help extract and work with [IPUMS](https:
 
 ***Miscellaneous R Packages for Extracting GIS Data***
 
-The [FedData](https://docs.ropensci.org/FedData/) package facilitates easy access to a number of raster datasets (i.e. elevation, cropland, landcover, hydrography etc.) compiled by a variety of federal agencies. 
-
-The [rnaturalearth](https://cran.r-project.org/web/packages/rnaturalearth/README.html) package provides an easy way to download country and region-level boundary data, as well as data on natural features like lakes and rivers.
-
-The [rnoaa](https://docs.ropensci.org/rnoaa/) package allows users to extract data from a variety of datasets maintained by NOAA into R. 
-
-The [stats19](https://docs.ropensci.org/stats19/) package allows for the extraction and analysis of road crash data from the UK. The package allows for the analysis of the spatial distribution of traffic accident data. 
-
-The [rWBclimate](https://docs.ropensci.org/rWBclimate/) package offers functions to extract climate data from several World Bank climate datasets.
-
-The [patentsview](https://docs.ropensci.org/patentsview/index.html) package facilitates the extraction of patent data within R via the PatentsView API. Location data relevant to patents is available. 
-
-The [pdfetch](https://cran.r-project.org/web/packages/pdfetch/pdfetch.pdf) package is not a GIS data extraction package per se, but allows users to extract economic and financial data from a variety of sources (FRED at the St.Louis Fed, Yahoo Finance, the Bureau of Labor Statistics, various central banks around the world etc.) which users can then join to spatial datasets for spatial visualization and analysis purposes. 
-
-The [crimedata](https://cran.r-project.org/web/packages/crimedata/vignettes/introduction.html) package facilitates the extraction of crime data (including data in sf format) from the [Crime Open Database](https://osf.io/zyaqn/). 
-
-The [lingtypology](https://ropensci.github.io/lingtypology/) package facilitates access to linguistics data, with a focus on mapping applications. The [glottospace](https://github.com/SietzeN/glottospace) package is also a package that facilitates the extraction of linguistics data, and the geospatial analysis of this data; it is broader in scope than *lingtypology*. 
-
-[ICPSR](https://www.icpsr.umich.edu/web/pages/) is (among other things), one of the largest and most prominent social science data archives around today. The [icpsrdata](https://cran.r-project.org/web/packages/icpsrdata/icpsrdata.pdf) package allows users to programmatically extract various ICPSR datasets within R. ICPSR is not solely a geospatial data archive, but it does have some GIS data, as well as a large collection of tabular datasets that can be joined to spatial datasets. 
+* The [FedData](https://docs.ropensci.org/FedData/) package facilitates easy access to a number of raster datasets (i.e. elevation, cropland, landcover, hydrography etc.) compiled by a variety of federal agencies. 
+* The [rnaturalearth](https://cran.r-project.org/web/packages/rnaturalearth/README.html) package provides an easy way to download country and region-level boundary data, as well as data on natural features like lakes and rivers.
+* The [rnoaa](https://docs.ropensci.org/rnoaa/) package allows users to extract data from a variety of datasets maintained by NOAA into R. 
+* The [stats19](https://docs.ropensci.org/stats19/) package allows for the extraction and analysis of road crash data from the UK. The package allows for the analysis of the spatial distribution of traffic accident data. 
+* The [rWBclimate](https://docs.ropensci.org/rWBclimate/) package offers functions to extract climate data from several World Bank climate datasets.
+* The [patentsview](https://docs.ropensci.org/patentsview/index.html) package facilitates the extraction of patent data within R via the PatentsView API. Location data relevant to patents is available. 
+* The [pdfetch](https://cran.r-project.org/web/packages/pdfetch/pdfetch.pdf) package is not a GIS data extraction package per se, but allows users to extract economic and financial data from a variety of sources (FRED at the St.Louis Fed, Yahoo Finance, the Bureau of Labor Statistics, various central banks around the world etc.) which users can then join to spatial datasets for spatial visualization and analysis purposes. 
+* The [crimedata](https://cran.r-project.org/web/packages/crimedata/vignettes/introduction.html) package facilitates the extraction of crime data (including data in sf format) from the [Crime Open Database](https://osf.io/zyaqn/). 
+* The [lingtypology](https://ropensci.github.io/lingtypology/) package facilitates access to linguistics data, with a focus on mapping applications. The [glottospace](https://github.com/SietzeN/glottospace) package is also a package that facilitates the extraction of linguistics data, and the geospatial analysis of this data; it is broader in scope than *lingtypology*. 
+* [ICPSR](https://www.icpsr.umich.edu/web/pages/) is (among other things), one of the largest and most prominent social science data archives around today. The [icpsrdata](https://cran.r-project.org/web/packages/icpsrdata/icpsrdata.pdf) package allows users to programmatically extract various ICPSR datasets within R. ICPSR is not solely a geospatial data archive, but it does have some GIS data, as well as a large collection of tabular datasets that can be joined to spatial datasets. 
 
 ### Subject-Specific GIS Data Sources
 
