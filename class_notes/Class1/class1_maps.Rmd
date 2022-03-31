@@ -564,14 +564,17 @@ tmap_mode("plot")
 
 ## Inset maps 
 
-An inset map is a 
+An inset map is a smaller map embedded within a larger map; it can serve a variety of purposes. For instance, if the map is a large scale map (covers a relatively small area in a lot of detail, i.e. a small region, city etc.), an inset map can help to provide context for where the mapped area is with respect to some larger geographic area. In the case of small scale maps, which display a large geographic area (as in world maps of the type we've developed here), an inset map can "zoom in" on an important geographic zone that might be of importance, and which requires emphasis. For example, let's say we want to make an inset map of the Southeast Asia region (a region where international trade seems particularly important). 
+
+Before making our inset map, let's first how to set our own legend breaks; this is helpful in making inset maps, since it can ensure that the inset map and the main map are using the same legend breaks, which can help with interpretation and avoid confusion.
+
+To set our own legend breaks, we can supply a vector of numbers to the "breaks" argument of ```tm_polygons()```. For example, let's say we want the following legend breaks in the map we created above: 0-25, 25-50, 50-75, 75-100, 100-150, 150-250, 250-400. To do so, we can simply pass the following to ```tm_polygons()```: ```breaks=c(0, 25, 50, 75, 100, 150, 250, 400)```. 
 
 ```{r}
 trade_map_2015_custom_breaks<-
 tm_shape(trade_2015_spatial)+
   tm_polygons(col="trade_gdp_2015",
-              n=7,
-              breaks=c(0, 25, 50, 75, 100, 150, 250, 400),
+              breaks=c(0, 25, 50, 75, 100, 150, 250, 400), # sets custom legend breaks
               palette="YlOrBr",
               title="Trade as a % of GDP,\n2015",
               textNA="No Data")+
@@ -586,66 +589,137 @@ tm_shape(trade_2015_spatial)+
    tm_credits("Map Author: Aditya Ranganath\nData Source: World Bank\nDevelopment Indicators (WDI)", position=c(0.4,0), size=0.38) 
 ```
 
+To avoid confusion, it's worth noting that in tmap, upper bounds in the legend are exclusive, while lower bounds are inclusive (for example, a hypothetical country with trade as a % of GDP equal to exactly 25 would be in the 25-50 category, not in the 0-25 category).  
+Let's quickly view the map we just created:
+
 ```{r}
 trade_map_2015_custom_breaks
 ```
+
+Now, we'll create an inset map of Southeast Asia that uses those same legend breaks. To do so, we need to make a new map object that covers only Southeast Asia, and then embed it within our main map. 
+
+The first step is therefore to subset the Southeast Asian countries, which we can do by filtering based on the "subregion" category of the dataset. We'll assign the subsetted data to its own object, called ```trade_2015_spatial_sea```:
 
 ```{r}
 trade_2015_spatial_sea<-trade_2015_spatial %>% 
                             filter(subregion=="South-Eastern Asia")
 ```
 
+Now, we'll take this subsetted sf object, and make a map. All the code below should be familiar, but note that instead of specifying the "main.title" within ````tm_polygons()```, we instead specify a "title" argument; the difference is that the "main.title" is situated outside a map's bounding box, while the "title" is situated within the bounding box. We'll assign the Southeast Asia map to a new object named ```sea_map```:
+
 ```{r}
-sea_map<-tm_shape(trade_2015_spatial_sea)+
-            tm_polygons(col="trade_gdp_2015",
-                        n=7,
-                        breaks=c(0, 25, 50, 75, 100, 150, 250, 400),
-                        palette="YlOrBr")+
-              tm_layout(legend.show=F,
-                      title="Southeast Asia",
-                      title.position=c("right", "top"),
-                      title.size=0.85)
+# Makes Southeast Asia map and assigns to new object named "sea_map"
+sea_map<-tm_shape(trade_2015_spatial_sea)+ # defines spatial object
+            tm_polygons(col="trade_gdp_2015", # defines column to be mapped
+                        n=7, # sets number of leg
+                        breaks=c(0, 25, 50, 75, 100, 150, 250, 400), # sets custom breaks
+                        palette="YlOrBr")+ # sets color palette
+              tm_layout(legend.show=F, # removes legend
+                      title="Southeast Asia", # adds inset title
+                      title.position=c("right", "top"), # positions inset title
+                      title.size=0.6) # sets inset title text
 ```
+
+Let's now see what the map looks like: 
 
 ```{r}
 sea_map
 ```
+
+At this point, we're ready to make our inset map: 
 
 ```{r, warning=F, message=F}
 trade_map_2015_custom_breaks
 print(sea_map, viewport(0.8, 0.27, width = 0.35, height = 0.35))
 ```
 
+In the code above, we first print the name of the object that contains the main map (i.e. the world map). The second line adds the Southeast Asia inset map to the main map, in a given location, and at a given size, which are specified by arguments passed to the ```viewport()``` function. To get your inset map in the location and size you want, make sure to play around with those coordinates within ```viewport()```. 
+
 # Extensions: generating and mapping derivative variables 
+
+In the exercise above, we simply mapped a variable extracted from WDI, namely, trade as a percentage of GDP for the year 2015. Sometimes, we may need to do a bit of processing work on our initial data, and map some derivative data to get a better sense of what we're studying. For instead, what if we wanted to create a map of the percentage point difference in trade as a percentage of GDP between 2015 and 2010 (i.e. trade as a % of GDP in 2015 minus trade as a % of GDP in 2010)? Or, what if we instead wanted to make a map of the average value of trade as a percentage of GDP from 2010-2018 (all the years in our sample)? The various data processing and preparation functions of the ```tidyverse``` make it relatively easy to carry out such tasks, so that we can map what we want to map. 
 
 ## Mapping change
 
+Let's consider temporal comparisons first. Let's say we want to map the percentage point difference in trade as a % of GDP between 2015 and 2010. Let's see how to generate this variable, and get it ready for mapping.
+
+First, we'll return to the ```trade_gdp_2010_2018``` object and extract our years of interest: 2015 and 2010. We'll assign the newly subsetted data to a new object named ```trade_gdp_2010_2015```:
+
 ```{r}
+# Subsets "trade_gdp_2010_2018", extracting observations where year is equal to 2010 or 2015; the subsetted data is assigned to a new object named "trade_gdp_2010_2015"
 trade_gdp_2010_2015<-trade_gdp_2010_2018 %>% 
                       filter(year=="2010"|year=="2015")
 ```
 
+Let's take a look at ```trade_gdp_2010_2015```:
 
 ```{r}
+View(trade_gdp_2010_2015)
+```
+
+```{r, echo=F}
+trade_gdp_2010_2015 %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Notice that the data is in "long" format; there are multiple rows associated with each country, with each row corresponding to a different year. Our task will be easier if we can work with a "wide" dataset, in which each year has its own column, and each row is associated with only one country. We can implement this "long to wide" transformation using the ```pivot_wider``` function. Below, the ```names_from=year``` argument to the ```pivot_wider``` function specifies the name of the current column which contains the categories (i.e. years) that we want to turn into columns; ```values_from=c(NE.TRD.GNFS.ZS)``` specifies that the current "NE.TRD.GNFS.ZS" column contains the values which will be associated with each Country/Year combination in the new "wide" dataset. We'll assign the newly created "wide" dataset to a new object named ```trade_gdp_2010_2015_wide```
+
+```{r}
+# Transforms "trade_gdp_2010_2015" from a "long" dataset to a "wide" dataset in which each year is assigned its own column and populated with values taken from the "trade_gdp_2010_2015"; the wide dataset is assigned to a new object named "trade_gdp_2010_2015_wide"
 trade_gdp_2010_2015_wide<-trade_gdp_2010_2015 %>% 
                           pivot_wider(names_from=year, values_from=c(NE.TRD.GNFS.ZS))
 ```
 
+```{r, echo=F}
+trade_gdp_2010_2015_wide<-trade_gdp_2010_2015_wide %>% 
+                           relocate(country, `2015`, `2010`)
+```
+
+Let's confirm that the data has been successfully reshaped:
 
 ```{r}
+View(trade_gdp_2010_2015_wide)
+```
+
+```{r, echo=F}
+trade_gdp_2010_2015_wide %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+To avoid confusion, let's rename the year columns so that they are more descriptive. Below, we'll rename "2015" to "trade_gdp_2015", and "2010" to "trade_gdp_2010": 
+
+```{r}
+# Renames year columns and updates "trade_gdp_2010_2015_wide" object
 trade_gdp_2010_2015_wide<-trade_gdp_2010_2015_wide %>% 
                             rename("trade_gdp_2015"="2015") %>% 
                             rename("trade_gdp_2010"="2010")
 ```
 
+Now, let's create a new variable, named "2015_2010_pctpt_difference", that calculates the percentage point difference in the trade share of GDP between 2015 and and 2010. We can create a new variable using existing variables with the ```mutate()``` function; we'll add this new variable to the existing dataset associated with "trade_gdp_2010_2015_wide": 
 
 ```{r}
+# Creates new variable, named "2015_2010_pctpt_difference", that is computed as the difference between "trade_gdp_2015" and "trade_gdp_2010"; this new variable is added to "trade_gdp_2010_2015_wide"
 trade_gdp_2010_2015_wide<-
   trade_gdp_2010_2015_wide %>% 
    mutate("2015_2010_pctpt_difference"=(trade_gdp_2015-trade_gdp_2010))
 ```
 
+Now that we have our data prepared, let's join ```trade_gdp_2010_2015_wide``` to our spatial dataset (```country_boundaries```), using the now-familiar ```full_join()``` function. We'll assign the product of the join to a new object named ```trade_gdp_2010_2015_wide_spatial```:
+
 ```{r}
+# Joins "trade_gdp_2010_2015_wide" to "country_boundaries" and assigns the joined dataset to a new object named "trade_gdp_2010_2015_wide_spatial"
 trade_gdp_2010_2015_wide_spatial<-full_join(country_boundaries, trade_gdp_2010_2015_wide,
                                     by=c("iso_a3"="iso3c"))
 ```
@@ -654,6 +728,8 @@ trade_gdp_2010_2015_wide_spatial<-full_join(country_boundaries, trade_gdp_2010_2
 trade_gdp_2010_2015_wide_spatial<-trade_gdp_2010_2015_wide_spatial %>% 
                                     relocate(name_long, trade_gdp_2015, trade_gdp_2010, "2015_2010_pctpt_difference", geometry)
 ```
+
+Let's now take a look at ```trade_gdp_2010_2015_wide_spatial```:
 
 ```{r}
 View(trade_gdp_2010_2015_wide_spatial)
@@ -670,13 +746,38 @@ trade_gdp_2010_2015_wide_spatial %>% datatable(extensions=c("Scroller", "FixedCo
 ))
 ```
 
+You'll notice we now have the percentage point difference in the trade share of GDP (between 2015 and 2010), stored in "2015_2010_pctpt_difference", within a spatial dataset. That variable is now ready to be mapped, using the *tmap* functions we learned earlier. As an exercise, see if you can make a map based on "2015_2010_pctpt_difference". 
+
 ## Mapping average values
+
+Instead of mapping individual years, let's say we want to map the average value of trade as a percentage of GDP across all the years in the original ```trade_gdp_2010_2018``` dataset (which may help smooth out fluctuations in the data). To do so, let's first generate a new dataset that contains the 2010-2018 average for our variable of interest, for each country in the dataset. We can use the ```group_by()``` and ```summarize()``` functions to do so. In the code below, we take our existing  ```trade_gdp_2010_2018``` object, and then group this dataset by the "iso3c" variable (```group_by(iso3c)```); this essentially establishes that we want to treat all observations with the same "iso3c" code (which uniquely identifies countries) as a group. The next line of code, ``` summarize(trade_2010_2018_mean=mean(NE.TRD.GNFS.ZS, na.rm=T)``` defines a new variable, named "trade_2010_2018_mean", which is calculated by taking the average of trade as a percentage of GDP for each of our country-level groups. In other words, the information in the newly defined "trade_2010_2018_mean" variable is the country-level average of trade as a share of GDP across all years in the dataset. This new dataset is assigned to a new object, named ```mean_trade()```.
 
 ```{r}
 mean_trade<-trade_gdp_2010_2018 %>% 
               group_by(iso3c) %>% 
               summarize(trade_2010_2018_mean=mean(NE.TRD.GNFS.ZS, na.rm=T))
 ```
+
+Let's see what it looks like:
+
+```{r}
+View(mean_trade)
+```
+
+```{r, echo=F}
+mean_trade %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+It's worth noting what the ```na.rm=T``` expression is doing in the code that generated this table. In particular, it effectively stipulates that NA values are to be ignored when calculating the mean. That is, some countries will have an NA value for some years in the dataset, but not others. By setting ```na.rm=T```, the calculation ignores these NA values, and returns a mean based on the data that is present. If we set ```na.rm=F```, the calculation does *not* ignore NA values; in this case, countries with data for some years and NA values for other years in ```trade_gdp_2010_2018```, would recieve NA values in the summarized dataset.  
+
+Now, let's join our summarized data to our spatial dataset (```country_boundaries```) based on the common 3-digit country code; we'll assign the joined data to a new object named ```mean_trade_spatial```:
 
 ```{r}
 mean_trade_spatial<-full_join(country_boundaries, mean_trade,
@@ -686,6 +787,8 @@ mean_trade_spatial<-full_join(country_boundaries, mean_trade,
 ```{r, echo=F, meassage=F}
 mean_trade_spatial<-mean_trade_spatial %>% relocate(name_long, trade_2010_2018_mean, geometry)
 ```
+
+Let's take a look at ```mean_trade_spatial```:
 
 ```{r}
 View(mean_trade_spatial)
@@ -702,17 +805,52 @@ mean_trade_spatial %>% datatable(extensions=c("Scroller", "FixedColumns"), optio
 ))
 ```
 
+Notice that ```trade_2010_2018_mean``` is now in a spatial object, and ready to be mapped. Again, as an exercise, you should try to map this variable using the *tmap* functions we learned about earlier. 
+
 # Exporting maps
 
-```{r}
-setwd("/Users/adra7980/Documents/gis_class_scratch")
-pdf("inset.pdf")
+Finally, once we have made our map(s) in R Studio, and everything looks satisfactory, we'll want to export them, so that they can be shared, embedded in papers etc.
+
+One easy way to export your maps is to use the "Export" button within the "Plots" window of your R Studio interface. Once you click on the "Export" button, things are fairly self-explanatory; you click through a few menus, and can save (to a specified location on your computer) the map displayed in the "Plots" window as a PDF or as an image file. 
+
+If you prefer to export your map programmatically (which may be preferable, from a reproducibility standpoint), you have a few options. The easiest programmatic option is to use the ```tmap_save``` function, which is a part of *tmap*. For example, recall the map assigned to ```trade_map_2015_custom_breaks```, which looks like this:
+
+```{r, warning=F, message=F}
 trade_map_2015_custom_breaks
-print(sea_map, viewport(0.8, 0.27, width = 0.35, height = 0.35))
-dev.off()
 ```
 
+Now, let's export this map using the following code:
 
+```{r, echo=-1, warning=F}
+setwd("/Users/adra7980/Documents/gis_class_scratch")
+tmap_save(tm=trade_map_2015_custom_breaks, 
+          filename="trade_gdp_custom.pdf", 
+          width=1920, 
+          height=1080)
+```
+
+Above, the first argument to ```tmap_save``` is the name of the map object we want to export (```trade_map_2015_custom_breaks```), the second argument is the file name we want to use for the exported file (along with the desired extension), and the "width" and "height" arguments specify the dimensions of the exported map. When this code is run, the map is exported to your working directory. Note that if we wanted our map as an image file, we could have simply specified a different file extension (i.e. .png instead of .pdf). It's best to experiment with different parameters for the "width" and "height" arguments until you get the exported map looking the way you want. There are other potential arguments to ```tmap_save()``` that allow you to further customize your exported map; we won't review them here, but you can learn more by looking at the function's documentation by typing```?tmap_save()```. 
+
+If you want to export a map with an inset, you will need to specify the name of the inset map object, and the viewport specifications. 
+
+Recall the inset map we created earlier, of Southeast Asia:
+
+```{r, warning=F}
+trade_map_2015_custom_breaks
+print(sea_map, viewport(0.8, 0.27, width = 0.35, height = 0.35))
+```
+
+To export this map, we can use the following: 
+
+```{r, echo=-1}
+setwd("/Users/adra7980/Documents/gis_class_scratch")
+tmap_save(tm=trade_map_2015_custom_breaks, # defines main map object
+          insets_tm = sea_map, # defines inset map object
+          insets_vp=viewport(0.8, 0.27, width = 0.35, height = 0.35), # sets viewport 
+          filename="trade_gdp_custom_inset.pdf", # sets desired filename for exported map
+          width=1920, # sets exported map width
+          height=1080) # sets exported map height
+```
 
 
 
