@@ -101,7 +101,7 @@ The [lingtypology](https://ropensci.github.io/lingtypology/) package facilitates
 
 [ICPSR](https://www.icpsr.umich.edu/web/pages/) is (among other things), one of the largest and most prominent social science data archives around today. The [icpsrdata](https://cran.r-project.org/web/packages/icpsrdata/icpsrdata.pdf) package allows users to programmatically extract various ICPSR datasets within R. ICPSR is not solely a geospatial data archive, but it does have some GIS data, as well as a large collection of tabular datasets that can be joined to spatial datasets. 
 
-## Subject-Specific GIS Data Sources
+### Subject-Specific GIS Data Sources
 
 While extracting data using R packages is convenient (and facilitates reproducibility), there are of course many datasets that do not currently have packages built around them, but which are still very useful. In these cases, you'll have to download the data from the source, and then load it into R Studio (or your GIS application of choice). Here are some useful data sources: 
 
@@ -112,7 +112,7 @@ While extracting data using R packages is convenient (and facilitates reproducib
 * ***Agriculture and Environment***: We've already mentioned several environment-related datasets, as well as IPUMS, but it's worth highlighting [IPUMS Terra](https://terra.ipums.org/) if you're interested in integrating social and environmental data in a GIS framework. The [Center for Sustainability and the Global Environment](https://sage.nelson.wisc.edu/) at the University of Wisconsin-Madison, and [CIESIN](http://ciesin.columbia.edu/) at Columbia are rich sources of information and data.
 * ***Legislative Boundaries***: For those of you interested in political institutions and outcomes, the [Constituency-Level Elections Archive (CLEA)](https://electiondataarchive.org/) is worth checking out. In particular, they have georeferenced and published (as vector data files) electoral constituency boundaries for several countries around the world. See [here](https://electiondataarchive.org/data-and-documentation/georeferenced-electoral-districts-datasets/) for this district-level GIS data.
 
-## Curated GIS repositories and data sources compiled by librarians and scholars
+### Curated GIS repositories and data sources compiled by librarians and scholars
 
 * The [Geoblacklight](https://geoblacklight.org/) project
 * A very helpful compilation of GIS data sources published by Professor Gordon McCord at UC San Diego is available [here](https://sites.google.com/site/gordoncmccord/gis?authuser=0](https://sites.google.com/site/gordoncmccord/gis?authuser=0)
@@ -120,13 +120,13 @@ While extracting data using R packages is convenient (and facilitates reproducib
 * Collections of GIS data sources compiled by librarians at [Penn](https://guides.library.upenn.edu/globalgis) and [Berkeley](https://guides.lib.berkeley.edu/gis/international)
 * Some useful [resources](https://libguides.colorado.edu/geospatialdata) from the GIS Librarian at CU Boulder. 
 
-## Google Earth Engine Data and Resources
+### Google Earth Engine Data and Resources
 
 * The Google Earth Engine catalog is available [here](https://developers.google.com/earth-engine/datasets) 
 * A curated list of [awesome earth engine]([https://github.com/giswqs/Awesome-GEE) resources. 
 * A [community archive](https://github.com/samapriya/awesome-gee-community-datasets) of earth engine datasets
 
-# Tools and Packages 
+## Useful tools and packages 
 
 * [https://ropensci.org/packages/geospatial/](https://ropensci.org/packages/geospatial/)
 * [https://github.com/sacridini/Awesome-Geospatial](https://github.com/sacridini/Awesome-Geospatial) 
