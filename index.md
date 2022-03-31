@@ -12,7 +12,7 @@ seo:
 Spring 2022, University of Colorado Boulder\
 Thursdays, 3:00-5:30 PM MST
 
-## Instructional Staff
+## Instructor
 
 Aditya Ranganath (he/his)\
 Data Librarian\

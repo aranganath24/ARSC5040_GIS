@@ -26,7 +26,8 @@ nav_order: 2
 * "How Spatial Join Works in GIS". 2022. *GISGeography.* [https://gisgeography.com/spatial-join/](https://gisgeography.com/spatial-join/)
 * "What is Geocoding?". *ArcGIS Dekstop Documentation.* [https://desktop.arcgis.com/en/arcmap/latest/manage-data/geocoding/what-is-geocoding.htm](https://desktop.arcgis.com/en/arcmap/latest/manage-data/geocoding/what-is-geocoding.htm) 
 
-*Read* **ONE** *of the following*:
+*Read* **ONE** *of the following*. *Please pay careful attention to the section in which the geospatial methods are discussed, and consider the following questions: What methods were used? How might you deploy these methods in your own research? Was there anything confusing about the methods section? Would you want to ask the author for clarification on anything?
+How could these research be extended in new directions?* 
 
 * Pengl, Yannick, Philip Roessler, and Valeria Rueda. 2021. “Cash Crops, Print Technologies, and the Politicization of Ethnicity in Africa.” *American Political Science Review* 116(1): 181-199.\
 doi: [https://doi.org/10.1017/S0003055421000782](https://doi.org/10.1017/S0003055421000782)
@@ -55,7 +56,5 @@ A link to the class notes will be available here soon after the class session.
 * Video on coordinate reference systems by Jonathan Soma: [https://www.youtube.com/watch?v=xJyJlKbZFlc&t=606s](https://www.youtube.com/watch?v=xJyJlKbZFlc&t=606s)
 * This [guide](https://guides.lib.berkeley.edu/gis/geocoding), from UC-Berkeley, provides a nice list of various geocoding tools; note that some of these resources may not be available at CU-Boulder, but many of them are available to the public. 
 
-
 ## Assignment
-
 

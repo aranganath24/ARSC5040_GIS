@@ -21,7 +21,7 @@ nav_order: 3
 \
 *Required Readings*
 
-* https://desktop.arcgis.com/en/arcmap/latest/manage-data/raster-and-images/what-is-raster-data.htm 
+* "What is Raster Data?" Esri. [https://desktop.arcgis.com/en/arcmap/latest/manage-data/raster-and-images/what-is-raster-data.htm](https://desktop.arcgis.com/en/arcmap/latest/manage-data/raster-and-images/what-is-raster-data.htm) 
 
 * Foley, Jonathan A., Ruth Defries, Gregory P. Asner, Carol Barford, Gordon Bonan, Stephen R. Carpenter, F. Stuart Chapin et al. 2005. “Global Consequences of Land Use. Science 309(5734): 570-574.\
 doi: [https://doi.org/10.1126/science.1111772](https://doi.org/10.1126/science.1111772)

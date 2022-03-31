@@ -41,7 +41,7 @@ I am available by email, and encourage you to contact me in between classes if y
 
 The following is a brief outline of our five class modules. Please click on the relevant link below (or to the left) to view more details on the relevant module's dedicated page:
 
-* [Class One](class1.md) (March 31): Basic concepts; spatial thinking; cartography
+* [Class One](class1.md) (March 31): Basic concepts; spatial thinking; mapping data
 * [Class Two](class2.md) (April 7): Vector data and geoprocessing
 * [Class Three](class3.md) (April 14): Raster data
 * [Class Four](class4.md) (April 21): Geospatial data ethics; Remote sensing and Google Earth Engine

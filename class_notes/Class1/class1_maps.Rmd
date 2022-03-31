@@ -842,7 +842,7 @@ print(sea_map, viewport(0.8, 0.27, width = 0.35, height = 0.35))
 
 To export this map, we can use the following: 
 
-```{r, echo=-1}
+```{r, echo=-1, warning=F}
 setwd("/Users/adra7980/Documents/gis_class_scratch")
 tmap_save(tm=trade_map_2015_custom_breaks, # defines main map object
           insets_tm = sea_map, # defines inset map object

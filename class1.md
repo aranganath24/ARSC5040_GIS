@@ -4,7 +4,7 @@ title: Class One
 nav_order: 1
 ---
 
-# Class One: Basic concepts; spatial thinking; cartography
+# Class One: Basic concepts; spatial thinking; mapping data
 {:.no_toc}
 
 ## Table of contents
@@ -39,11 +39,24 @@ doi: [https://doi.org/10.1146/annurev-polisci-031710-112604](https://doi.org/10.
 
 A link to the class notes will be available here soon after the class session. 
 
+## Class Tutorial
+
+The tutorial for Class One is available [here](class_notes/Class1/class1_maps.html). 
+
 ## Useful resources
 
-* [Cartography Guide](https://www.axismaps.com/guide) by Axis Maps. 
+* [Cartography Guide](https://www.axismaps.com/guide) by Axis Maps
+* [Choropleth Map Guide](https://www.axismaps.com/guide/choropleth)
 
 ## Assignment
+
+Due by the beginning of next class (April 7) via email. 
+
+Please make a choropleth map that shows how a variable you are interested in varies across a given set of geographic units. You are welcome to hew closely to the class tutorial, and map a World Bank WDI variable of your choice. However, you are also encouraged to move in different directions, and create a choropleth map that is relevant to one of your research interests. If you are looking for a spatial dataset to which you can join the tabular data you want to map, feel free to let me know and I can try to help you. 
+
+Please provide all of the code you used to generate the map, in addition to the map itself. Also, please comment your code wherever appropriate. 
+
+Finally, write a brief paragraph in which you discuss the spatial patterns that the map helps you to identify. Are there any patterns of clustering or dispersion that you find interesting? Do you notice anything surprising or unexpected? And, what future research questions might this map suggest?
 
 
 
