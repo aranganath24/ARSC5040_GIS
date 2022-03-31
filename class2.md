@@ -15,7 +15,9 @@ nav_order: 2
 
 ---
 
-## Introduction
+## Overview
+
+In this session, we will cover vector data (which we were introduced to in the previous session when working with a spatial dataset of country boundaries) more explicitly, and explore the different ways it can be manipulated and analyzed, and the different ways it can be used to inform our understanding of social phenomena. We will also explore some of the practical considerations to keep in mind when working with map coordinate systems. The in-class exercise will give you some practice in carrying out basic vector data operations in R Studio. 
 
 ## Readings
 \

@@ -15,7 +15,9 @@ nav_order: 5
 
 ---
 
-## Introduction
+## Overview
+
+In our final class session, we will briefly discuss some of the methodological promises and pitfalls of GIS work, from the standpoint of research design. The bulk of the class session will be devoted to your "lightning-talks", in which you present your progress on your final project. Please note that I have suggested a few readings (under the label "GIS and Society"), that explore the consequences of geospatial technology, visualization, and analysis for society (from a social scientific perspective). I think this is going to be a really interesting research agenda in the next 5-10 years, and therefore wanted to suggest some work that might give you a  sense of some of the work being done in this area; however, we won't have time to discuss it. 
 
 ## Readings
 \
@@ -26,6 +28,10 @@ doi:[https://doi.org/10.1093/cesifo/ifx026](https://doi.org/10.1093/cesifo/ifx02
 
 * Branch, Jordan. 2016. “Geographic Information Systems (GIS) in International Relations.” *International Organization* 70: 845-869.\
 doi: [https://doi.org/10.1017/S0020818316000199](https://doi.org/10.1017/S0020818316000199)
+
+*Option Reading (Causal Inference)*
+
+* Keele, Luke J. and Rocio Titiunik. 2015. "Geographic Boundaries as Regression Discontinuities". *Political Analysis* 23(1): 127-155. doi: [https:/doi.org/10.1093/pan/mpu014](https:/doi.org/10.1093/pan/mpu014). 
 
 *Optional Readings (GIS and Society)*
 

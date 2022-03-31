@@ -852,6 +852,6 @@ tmap_save(tm=trade_map_2015_custom_breaks, # defines main map object
           height=1080) # sets exported map height
 ```
 
-
+<div class="tocify-extend-page" data-unique="tocify-extend-page" style="height: 0;"></div>
 
 

@@ -15,7 +15,9 @@ nav_order: 3
 
 ---
 
-## Introduction
+## Overview
+
+In this session, we will consider the second major type of GIS data (which we have not yet worked with before): raster data. Raster data is essentially a georeferenced grid, rather than georeferenced points, lines, or polygons. We'll talk about the types of data that are represented with rasters, and the various social-scientific uses of raster datasets. The in-class exercise will give you some practice in visualizing raster data, and exploring how raster and vector datasets can be brought together to generate novel empricial measurements at micro-level spatial scales.  
 
 ## Readings
 \

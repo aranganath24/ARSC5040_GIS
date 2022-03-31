@@ -15,7 +15,9 @@ nav_order: 4
 
 ---
 
-## Introduction
+## Overview
+
+In this session, we will begin with a discussion of geospatial data ethics, and think about the distinctive ethical issues that might arise in the context of working with GIS data. Then, we'll introduce basic concepts and tools related to satellite imagery and remote sensing, and explore some social scientific applications of this data. The in-class exercise will focus on getting you acquainted with Google Earth Engine, which is a platform for extracting and analyzing remotely sensed data. To that end, please make sure you've been approved for Google Earth Engine access by the start of class (the process can take up to a week). More details on gaining access to GEE are available on the syllabus, under the section on "Course Materials and Software".  
 
 ## Readings and Video
 \

@@ -111,7 +111,7 @@ Final grades will be determined as follows.
 
 “If you need accommodations for a disability, it is recommended that you submit an accommodation letter from Disability Services. Disability Services determines accommodations based on documented disabilities in the academic environment. Information on requesting accommodations is located on the Disability Services website. Contact Disability Services at 303-492-8671 or [dsinfo@colorado.edu](mailto:dsinfo@colorado.edu) for further assistance. If you have a temporary medical condition or injury, see Temporary Medical Conditions under the Students tab on the Disability Services website.”
 
-Please note that no one is required to self-disclose their disabilities. If you have a disability that is not recognized by Disability Services, please let us know how we can best support your learning.
+Please note that no one is required to self-disclose their disabilities. If you have a disability that is not recognized by Disability Services, please let us know how I can best support your learning.
 
 ## Classroom Behavior
 

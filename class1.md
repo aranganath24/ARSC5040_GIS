@@ -15,7 +15,9 @@ nav_order: 1
 
 ---
 
-## Introduction
+## Overview
+
+In this introductory session, we will use the required readings to reflect, in general terms, on how spatial data and "spatial thinking" might inform your current (or future) research projects. The in-class exercise will introduce you to the basic process of transforming a tabular dataset into a choropleth map. 
 
 ## Readings
 \
