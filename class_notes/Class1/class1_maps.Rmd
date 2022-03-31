@@ -408,18 +408,155 @@ tm_shape(trade_2015_spatial)+ # specifies spatial object
               palette="YlOrBr") # sets color palette
 ```
 
-## Refine the map
+## Refining maps
 
-This is a nice start, but the map of course needs refinement. Perhaps the most glaring issue is the placement of the legend, which is superimposed on the map itself, which leads to a situation in which the legend and map mutually obscure each other. 
+This is a nice start, but the map of course needs refinement. Perhaps the most glaring issue is the placement of the legend, which is superimposed on the map itself, which leads to a situation in which the legend and map mutually obscure each other. Let's take the previous map, and make just a few changes that address this issue. In particular, we'll call a new function, called ```tm_layout()```, which allows us to customize the map's layout in various ways. Within this function, we'll specify ```legend.outside=T```, which places the legend outside the map's bounding box (i.e. the rectangular frame which surrounds it), and ```legend.outside.position="bottom"```, which sets the particular location of the legend outside the bounding box: 
+
+```{r, fig.asp=0.5, warning=F, echo=-1, message=F}
+tmap_mode("plot")
+tm_shape(trade_2015_spatial)+
+  tm_polygons(col="trade_gdp_2015",
+              n=7,
+              style="quantile",
+              palette="YlOrBr")+
+    tm_layout(legend.outside=T, # Sets legend outside map frame
+              legend.outside.position = "bottom") # Sets position of map legend on bottom
+```
+
+That looks better! Now, let's make just a few more changes to the legend and the map's appearance. We'll remove the map frame/bounding box by specifying ```frame=FALSE```; we'll also set ```title=Trade as a % of GDP,\n2015``` within the ```tm_polygon()``` function; this effectively renames the legend title (which was previously "trade_gdp_2015", i.e. taken directly from the column name). Note the ```\n```; this simply indicates that we want to start a new line after the comma, so that the "2015" is below the part that reads "Trade as a % of GDP". Finally, we'll change the label for the "Missing" legend category to "No Data" by specifying ```textNA="No Data"```:
+
+```{r, warning=FALSE, echo=-1, message=F}
+tmap_mode("plot")
+tm_shape(trade_2015_spatial)+
+  tm_polygons(col="trade_gdp_2015",
+              n=7,
+              style="quantile",
+              palette="YlOrBr",
+              title="Trade as a % of GDP,\n2015", # Sets legend title
+              textNA="No Data")+ # Relabels "Missing" Category to "No Data"
+    tm_layout(legend.outside=T,
+              legend.outside.position = "bottom",
+              frame=FALSE) # Removes bounding box
+```
+
+Let's now add a main title for our map. We can set the main title by specifying it as an argument within the ```tm_layout()``` function. Below, ```main.title="Crossnational Variation in Commercial Integration, 2015"``` within the ```tm_layout()``` function sets the map's main title, ```main.title.size=1``` sets the size of the main title's text, and ```main.title.position="center"``` center-justifies the title: 
+
+```{r, warning=F, echo=-1, message=F}
+tmap_mode("plot")
+tm_shape(trade_2015_spatial)+
+  tm_polygons(col="trade_gdp_2015",
+              n=7,
+              style="quantile",
+              palette="YlOrBr",
+              title="Trade as a % of GDP,\n2015",
+              textNA="No Data")+
+    tm_layout(legend.outside=T,
+              legend.outside.position = "bottom",
+              main.title="Crossnational Variation in Commercial Integration, 2015",
+              main.title.size=1,
+              main.title.position="center",
+              frame=FALSE)
+```
+
+If we want to add a bit of space between the title and the map, we can do so by playing around with the map's margins, via the "inner.margins" argument; below, we'll set ```inner.margins=c(0.06,0.10,0.10,0.08)```. Note that the ```c``` before the parentheses is actually a function, which establishes that the elements enclosed by the parentheses are to be considered a vector; a vector is simply a sequence of elements (in this case, numbers that specify the map margins).
+
+```{r, echo=-1, warning=F, message=F}
+tmap_mode("plot")
+tm_shape(trade_2015_spatial)+
+  tm_polygons(col="trade_gdp_2015",
+              n=7,
+              style="quantile",
+              palette="YlOrBr",
+              title="Trade as a % of GDP,\n2015",
+              textNA="No Data")+
+    tm_layout(legend.outside=T,
+              legend.outside.position = "bottom",
+              main.title="Crossnational Variation in Commercial Integration, 2015",
+              main.title.size=1,
+              main.title.position="center",
+              inner.margins=c(0.06,0.10,0.10,0.08), # Sets margins to create whitespace
+              frame=FALSE)
+```
+
+Note that above, we see a bit of white space open up between the map and the main title. 
+
+Now, let's add a "credits" section to specify the name of the map author and the data source (and any other relevant metadata):
+
+```{r, echo=-1, warning=F, message=F}
+tmap_mode("plot")
+tm_shape(trade_2015_spatial)+
+  tm_polygons(col="trade_gdp_2015",
+              n=7,
+              style="quantile",
+              palette="YlOrBr",
+              title="Trade as a % of GDP,\n2015",
+              textNA="No Data")+
+    tm_layout(legend.outside=T,
+              legend.outside.position = "bottom",
+              main.title="Crossnational Variation in Commercial Integration, 2015",
+              main.title.size=1,
+              main.title.position="center",
+              inner.margins=c(0.06,0.10,0.10,0.08), # Sets margins to create whitespace
+              frame=FALSE,
+              attr.outside = TRUE)+ # Places credits section outside map
+   tm_credits("Map Author: Aditya Ranganath\nData Source: World Bank\nDevelopment Indicators (WDI)", position=c(0.78,0), size=0.38) # Specifies content, position, size of credits
+```
+
+In the code that generated the map above, ```attr.outside=TRUE```, within the ```tm_layout()``` function, while the arguments to the ```tm_credits()``` function specify the text of the map credits, the position of the map credits, and the text size of the map credits. The best approach to deciding where to position the credits, and how large to make them, is trial and error. 
+
+Recall from before that we can always assign our maps to objects, which allows us to conveniently store and refer back to them when needed. Now that we have our map code more or less done (though it's worth emphasizing that you can do a lot more to customize and shape the appearance of the map to your liking using many *tmap* functions and arguments that we haven't discussed here, but that you should explore!), let's assign the map code above to an object, which we'll call ```trade_map_2015```:
+
+
+```{r, echo=-1, warning=F, message=F}
+tmap_mode("plot")
+trade_map_2015<-
+tm_shape(trade_2015_spatial)+
+  tm_polygons(col="trade_gdp_2015",
+              n=7,
+              style="quantile",
+              palette="YlOrBr",
+              title="Trade as a % of GDP,\n2015",
+              textNA="No Data")+
+    tm_layout(legend.outside=T,
+              legend.outside.position = "bottom",
+              main.title="Crossnational Variation in Commercial Integration, 2015",
+              main.title.size=1,
+              main.title.position="center",
+              inner.margins=c(0.06,0.10,0.10,0.08), # Sets margins to create whitespace
+              frame=FALSE,
+              attr.outside = TRUE)+ 
+   tm_credits("Map Author: Aditya Ranganath\nData Source: World Bank\nDevelopment Indicators (WDI)", position=c(0.78,0), size=0.38) 
+```
+
+Now, whenever we print the name of the object, ```trade_map_2015```, our map will print to the R Studio "Plots" window. 
+
+```{r, message=F, warning=F, echo=-1}
+tmap_mode("plot")
+# prints map assigned to "trade_map_2015" object
+trade_map_2015
+```
+
+## Interactive choropleths
+
+
+
+## Inset maps 
+
+# Extensions: generating new variables to map
+
+
+
+
+
+
 
 ```{r}
 tm_shape(trade_2015_spatial)+ # specifies spatial object
-  tm_polygons(col="trade_gdp_2015", # specifies column in spatial object to be mapped
-              n=7, # sets number of break points
-              style="quantile", # specifies how data is to be partitioned across break points
-              palette="YlOrBr")+ # sets color palette
+  tm_polygons(col="trade_gdp_2015", 
+              legend.is.portrait=FALSE,
+              palette="YlOrBr",
+              style="cont")+
     tm_layout(legend.outside=T,
               legend.outside.position = "bottom")
 ```
-
 
