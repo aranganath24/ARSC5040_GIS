@@ -150,7 +150,7 @@ Note that extracting the "geometry" column prints some useful metadata; it tells
 To translate the information in the "geometry" column of the dataset into a cartographic representation, we’ll use the *tmap* package. In particular, we’ll use the ```tm_shape``` and ```tm_polygons``` functions from *tmap*, which are connected by a plus sign (+). The argument passed to the ```tm_shape``` function is the name of the object associated with the spatial dataset (```country_boundaries```, defined above). In addition, the tm_polygons function indicates that the spatial data is to be represented using polygons (as opposed to alternatives such as lines or points), and does not require any arguments (we'll add some arguments in just a bit). When we type in and run the following code from our script, the result is a map that is rendered based on the information in the “geometry” column of country_boundaries:
 
 ```{r, fig.asp=0.5}
-# maps geographic features (i.e. countries) of "country_boundaries" using tmap package functions
+# maps geographic features (i.e. countries) of "country_boundaries" as polygons using tmap package functions
 tm_shape(country_boundaries)+
   tm_polygons()
 ```
@@ -160,7 +160,7 @@ If you don't like the grey polygons, you can specify a desired color within the 
 For example, let's say we want to draw the polygons in the color associated with "darkorange" on the cheat sheet. We can use the following:
 
 ```{r, fig.asp=0.5}
-# maps geographic features (i.e. countries) of "country_boundaries" using tmap package functions; polygons rendered in "darkorange"
+# maps geographic features (i.e. countries) of "country_boundaries" as polygons using tmap package functions; polygons rendered in "darkorange"
 tm_shape(country_boundaries)+
   tm_polygons("darkorange")
 ```
@@ -281,11 +281,12 @@ Now that you've extracted this table of variable names and codes, scroll through
 In this example, let's say we're interested in mapping trade as a percentage of GDP (i.e. the value of a country's exports + imports divided by its GDP), which is a useful summary measure that captures the importance of international trade to a country's economy. Based on the ```WDI_variables``` table we generated, we can see that the variable code for this variable is **NE.TRD.GNFS.ZS**. We'll use this variable code within the ```WDI``` function to extract the "trade as a % of GDP" indicator for a given time frame. Here, we'll specify our time frame as 2010-2018. We'll assign the extracted data to a new object named ```trade_gdp_2010_2018```:
 
 ```{r}
-trade_gdp_2010_2018<-WDI(country="all",
-                                indicator="NE.TRD.GNFS.ZS",
-                                start=2010,
-                                end=2018,
-                                extra=T)
+# Extracts WDI indicator that we want and assigns the resulting data to an object named "trade_gdp_2018_2018"
+trade_gdp_2010_2018<-WDI(country="all", # specifies we want data for all countries available
+                                indicator="NE.TRD.GNFS.ZS", # specifies code for desired indicator
+                                start=2010, # Start year for data series
+                                end=2018, # End year for data series
+                                extra=T) # returns ISO codes
 ```
 
 At this point, country-level data on trade as a percentage of GDP, for each year between 2010 and 2018, has been has been extracted via the World Bank API and assigned to ```trade_gdp_2010_2018```. Let's see what the data looks like:
@@ -310,9 +311,11 @@ trade_gdp_2010_2018 %>% datatable(extensions=c("Scroller", "FixedColumns"), opti
 We'll make use of the multiple years worth of data later, but for now, let's say we only want to map the 2015 values for our variable of interest. Let's make life easier by generating a new dataset that only contains 2015 observations; we'll also rename (using the ```rename()``` function) the awkwardly named "NE.TRD.GNFS.ZS" column (which contains our variable of interest) to "trade_pct_GDP_2015", which is slightly more descriptive. We'll assign this new dataset to an object named "trade_gdp_2015":
 
 ```{r}
-trade_gdp_2015<-trade_gdp_2010_2018 %>% 
-                  filter(year=="2015") %>% 
-                  rename(trade_gdp_2015=NE.TRD.GNFS.ZS)
+# Extracts 2015 observations from "trade_gdp_2010_2018", renames "NE.TRD.GNFS.ZS" column to "trade_gdp_2015", and assigns result to new object named "trade_gdp_2015"
+trade_gdp_2015<-
+  trade_gdp_2010_2018 %>%  # Establishes object to be modified
+  filter(year=="2015") %>% # Subsets observations where the "year" variable equals "2015"
+  rename(trade_gdp_2015=NE.TRD.GNFS.ZS) # renames column containing WDI variable
 ```
 
 Let's open up the new dataset and note the changes:
@@ -375,148 +378,48 @@ Note that we now have the variable we want to map ("trade_gdp_2015") inside a sp
 
 # Displaying country-level variation in the WDI indicator on a map
 
+## Make a preliminary map
+
 At this point, let's go back to the *tmap* package. Let's make the most basic possible choropleth map of the "trade_gdp_2015" variable:
 
-```{r}
-# Maps country-level variation
-tm_shape(trade_2015_spatial)+
-  tm_polygons(col="trade_gdp_2015",
-              n=8,
-              style="jenks",
-              palette="BuGn")
+```{r, fig.asp=0.5}
+# Maps country-level variation in the "trade_gdp_2015" variable
+tm_shape(trade_2015_spatial)+ # specifies spatial object
+  tm_polygons(col="trade_gdp_2015", # specifies column in spatial object to be mapped
+              n=5, # sets number of break points
+              style="jenks", # specifies how data is to be partitioned across break points
+              palette="BuGn") # sets color palette
 ```
 
+In the code above we first use the ```tm_shape()``` function in *tmap* to specify the name of the sf object that we want to map; here, that is ```trade_2015_spatial```. We then add a "+" sign (recall from above that *tmap* functions are chained together using a "+"), and then call the ```tm_polygons()``` function, which we also encountered before. This time, we supply some new arguments to ```tm_polygons```. Let's consider them in turn:
 
+* ```col="trade_gdp_2015"``` specifies the name of the column in the spatial dataset (which has been specified as an argument to the tm_shape function) that contains the data we’d like to map.
+* ```n=8``` specifies that we want the data to be partitioned into 5 break points, while ```style="jenks"``` indicates that we want to set break points in the data distribution using the Jenks Natural Breaks Classification; to see other options for partitioning your data, see the function’s documentation using ```?tm_polygons()```. For more information on the Jenks Natural Breaks Classification, as well as other data partition methods, see [here](https://www.axismaps.com/guide/data-classification).
+* ```palette="BuGn"``` specifies the color scheme that we want to use to represent the data.  “BuGn” refers to a blue-green color gradient, which the map uses to represent country-level variation in trade as a share of GDP in 2015. For other palette options, and the associated palette codes, please refer again to the [R Color Cheat Sheet](https://www.nceas.ucsb.edu/sites/default/files/2020-04/colorPaletteCheatsheet.pdf).
 
+It's easy to experiment with different parameters in the arguments to ```tm_polygons()```. For instance, let's say we want to try out a map with 7 break points, with the data partitioned according to the "quantile" classification system, and a yellow to brown color palette ("YlOrBr"):
 
-
-
-
-
-
-
-
-
-
-
-
-```{r, echo=F}
-trade_2015_spatial_truncated<-trade_2015_spatial %>% 
-                               select(country, iso_a3, NE.TRD.GNFS.ZS, year, geometry)
+```{r, warning=F, fig.asp=0.5}
+# Maps country-level variation in the "trade_gdp_2015" variable
+tm_shape(trade_2015_spatial)+ # specifies spatial object
+  tm_polygons(col="trade_gdp_2015", # specifies column in spatial object to be mapped
+              n=7, # sets number of break points
+              style="quantile", # specifies how data is to be partitioned across break points
+              palette="YlOrBr") # sets color palette
 ```
 
-```{r}
-View(trade_2015_spatial)
-```
+## Refine the map
 
-```{r, echo=F}
-trade_2015_spatial_truncated %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
-  deferRender = TRUE,
-  scrollY = 350,
-  scrollX = 350,
-  dom = "t",
-  scroller = TRUE,
-  fixedColumns = list(leftColumns = 3)
-))
-```
+This is a nice start, but the map of course needs refinement. Perhaps the most glaring issue is the placement of the legend, which is superimposed on the map itself, which leads to a situation in which the legend and map mutually obscure each other. 
 
 ```{r}
-trade_2015_spatial<-trade_2015_spatial %>% 
-                      rename(trade_pct_gdp=NE.TRD.GNFS.ZS)
+tm_shape(trade_2015_spatial)+ # specifies spatial object
+  tm_polygons(col="trade_gdp_2015", # specifies column in spatial object to be mapped
+              n=7, # sets number of break points
+              style="quantile", # specifies how data is to be partitioned across break points
+              palette="YlOrBr")+ # sets color palette
+    tm_layout(legend.outside=T,
+              legend.outside.position = "bottom")
 ```
-
-## Make map of WDI data
-
-```{r}
-tm_shape(trade_2015_spatial)+
-  tm_polygons(col="trade_pct_gdp", palette="YlOrRd", style="jenks",
-              n=5)
-```
-## Make map with inset map
-
-```{r}
-unique(trade_2015_spatial$subregion)
-```
-
-```{r}
-trade_2015_spatial_sea<-trade_2015_spatial %>% 
-                            filter(subregion=="South-Eastern Asia")
-
-y<-tm_shape(trade_2015_spatial_sea)+
-  tm_polygons(col="trade_pct_gdp", palette="YlOrRd", style="jenks",
-              n=5)
-
-y
-```
-
-```{r}
-library(grid)
-x<-tm_shape(trade_2015_spatial)+
-  tm_polygons(col="trade_pct_gdp", palette="YlOrRd", style="jenks",
-              n=5)
-x
-print(y, vp = viewport(0.8, 0.27, width = 0.5, height = 0.5))
-```
-
-
-```{r}
-library(grid)
-x<-tm_shape(trade_2015_spatial)+
-  tm_polygons(col="trade_pct_gdp", palette="YlOrRd", style="jenks",
-              n=5)
-x
-print(y, vp = viewport(0.8, 0.18, width = 0.3, height = 0.3))
-```
-## Map change over time
-
-```{r}
-trade_gdp_2010_2015<-trade_gdp_2010_2018 %>% 
-                      filter(year=="2010"|year=="2015")
-```
-
-
-```{r}
-trade_gdp_2010_2015_wide<-trade_gdp_2010_2015 %>% 
-                          pivot_wider(names_from=year, values_from=c(NE.TRD.GNFS.ZS))
-```
-
-```{r}
-trade_gdp_2010_2015_wide<-trade_gdp_2010_2015_wide %>% 
-                            rename("trade_gdp_2015"="2015") %>% 
-                            rename("trade_gdp_2010"="2010")
-```
-
-
-```{r}
-trade_gdp_2010_2015_wide<-trade_gdp_2010_2015_wide %>% 
-                          mutate("2015_2010_pctpt_difference"=(trade_gdp_2015-trade_gdp_2010))
-```
-
-```{r}
-trade_gdp_2010_2015_wide_spatial<-full_join(country_boundaries, trade_gdp_2010_2015_wide,
-                                    by=c("iso_a3"="iso3c"))
-```
-
-```{r}
-tm_shape(trade_gdp_2010_2015_wide_spatial)+
-  tm_polygons(col="2015_2010_pctpt_difference", palette="Greens", style="jenks",
-              n=5, midpoint=T)
-```
-
-
-
-https://ecodiv.earth/post/creating-a-map-with-inset-using-tmap/
-
-# Country-Level Map
-
-# USA Local Map 
-
-# Foreign Local Map 
-
-
-https://datacatalog.worldbank.org/search/dataset/0041418
-
-https://databank.worldbank.org/reports.aspx?dsid=41&series=IN.ENV.PM.CONC#
-
 
 
