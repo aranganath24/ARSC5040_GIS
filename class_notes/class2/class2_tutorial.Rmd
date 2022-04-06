@@ -1,0 +1,861 @@
+---
+title: "Geoprocessing and Vector Data Analysis"
+author: "Aditya Ranganath"
+date: "3/31/2022"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+    number_sections: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=F, warning=F}
+library(WDI)
+library(sf)
+library(tmap)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(tidyverse)
+library(grid)
+library(tidycensus)
+library(tidygeocoder)
+library(units)
+```
+
+```{r, echo=F, warning=F}
+library(DT) 
+```
+
+# Scripting tools: functions and iteration with the tidyverse
+
+```{r}
+country_boundaries<-ne_countries(scale="medium", returnclass="sf") %>% 
+                       filter(iso_a3 !="ATA")
+                    
+```
+
+```{r}
+tm_shape(country_boundaries)+
+  tm_polygons()
+```
+
+```{r}
+trade_gdp_2010_2018<-WDI(country="all", # specifies we want data for all countries available
+                                indicator="NE.TRD.GNFS.ZS", # specifies code for desired indicator
+                                start=2010, # Start year for data series
+                                end=2018, # End year for data series
+                                extra=T) # returns
+```
+
+
+```{r}
+trade_gdp_2015<-
+  trade_gdp_2010_2018 %>%  # Establishes object to be modified
+  filter(year=="2015") %>% # Subsets observations where the "year" variable equals "2015"
+  rename(trade_gdp_2015=NE.TRD.GNFS.ZS)
+```
+
+```{r}
+trade_2015_spatial<-full_join(country_boundaries, trade_gdp_2015,
+                                    by=c("iso_a3"="iso3c"))
+```
+
+```{r}
+tm_shape(trade_2015_spatial)+
+  tm_polygons(col="trade_gdp_2015",
+              n=7,
+              style="quantile",
+              palette="YlOrBr",
+              title="Trade as a % of GDP,\n2015",
+              textNA="No Data")+
+    tm_layout(legend.outside=T,
+              legend.outside.position = "bottom",
+              main.title="Crossnational Variation in Commercial Integration, 2015",
+              main.title.size=1,
+              main.title.position="center",
+              inner.margins=c(0.06,0.10,0.10,0.08), # Sets margins to create whitespace
+              frame=FALSE,
+              attr.outside = TRUE)+ # Places credits section outside map
+   tm_credits("Map Author: Aditya Ranganath\nData Source: World Bank\nDevelopment Indicators (WDI)", position=c(0.78,0), size=0.38) # Specifies content, position, size of credits
+```
+
+```{r}
+wdi_map_maker<-function(wdi_variable_code, start_year, end_year, 
+                        legend.title, main_map_title){
+
+country_boundaries<-ne_countries(scale="medium", returnclass="sf") %>% 
+                       filter(iso_a3 !="ATA")
+  
+wdi_extract<-WDI(country="all",
+              indicator=wdi_variable_code,
+              start=start_year,
+              end=end_year,
+              extra=T)
+
+spatial_object_tomap<-full_join(country_boundaries, wdi_extract,
+                                    by=c("iso_a3"="iso3c"))
+
+final_map<-tm_shape(spatial_object_tomap)+
+  tm_polygons(col=wdi_variable_code,
+              n=7,
+              style="quantile",
+              palette="YlOrBr",
+              title=legend.title,
+              textNA="No Data")+
+    tm_layout(legend.outside=T,
+              legend.outside.position = "bottom",
+              main.title=main_map_title,
+              main.title.size=1,
+              main.title.position="center",
+              inner.margins=c(0.06,0.10,0.10,0.08), # Sets margins to create whitespace
+              frame=FALSE,
+              attr.outside = TRUE)+ # Places credits section outside map
+   tm_credits("Map Author: Aditya Ranganath\nData Source: World Bank\nDevelopment Indicators (WDI)", position=c(0.78,0), size=0.38) # Specifies content, position, size of credits
+return(final_map)
+}
+```
+
+
+```{r}
+wdi_map_maker(wdi_variable_code="BG.GSR.NFSV.GD.ZS", start_year=2017, end_year=2017, 
+                        legend.title="Services Trade (% of GDP)", main_map_title="Service Market Integration, 2017")
+```
+
+
+```{r}
+wdi_map_maker(wdi_variable_code="GC.TAX.TOTL.GD.ZS", start_year=2017, end_year=2017, 
+                        legend.title="Taxes (% of GDP)", main_map_title="Government Taxes as a Share of GDP, 2017")
+```
+
+
+```{r}
+input_list<-list(wdi_variable_code=c("BG.GSR.NFSV.GD.ZS", "GC.TAX.TOTL.GD.ZS"),
+                 start_year=c(2017, 2017),
+                 end_year=c(2017, 2017),
+                 legend.title=c("Services Trade (% of GDP)", "Taxes (%GDP)"),
+                 main_map_title=c("Service Market Integration, 2017", "Government Taxes as a Share of GDP, 2017")) 
+```
+
+
+```{r}
+map_list<-pmap(input_list, wdi_map_maker)
+```
+
+
+```{r}
+map_list[[1]]
+```
+
+```{r}
+map_list[[2]]
+```
+# Layering Data
+
+[https://www.aiddata.org/data/world-bank-geocoded-research-release-level-1-v1-4-2](https://www.aiddata.org/data/world-bank-geocoded-research-release-level-1-v1-4-2)
+
+```{r}
+worldbank_project_locations<-read_csv("https://www.dropbox.com/s/bzmqj2h29ewov9o/worldbank_projects_locations.csv?dl=1")
+```
+
+```{r}
+worldbank_locations_spatial<-st_as_sf(worldbank_project_locations, coords=c("longitude", "latitude"), crs=4326)
+```
+
+```{r}
+tm_shape(worldbank_locations_spatial)+
+  tm_dots()
+```
+
+```{r}
+tm_shape(country_boundaries)+
+  tm_polygons()+
+tm_shape(worldbank_locations_spatial)+
+  tm_dots()
+```
+
+```{r, echo=-1}
+tmap_mode("plot")
+worldmap_projects<-
+  tm_shape(country_boundaries)+
+    tm_polygons("red2")+
+  tm_shape(worldbank_locations_spatial)+
+    tm_dots("lightblue1")
+
+worldmap_projects
+```
+
+# Spatial joins
+
+```{r, echo=-1}
+setwd("class_notes/class2/data/data_malawi")
+Malawi_constituencies<-st_read("MAA.shp")
+```
+
+```{r}
+tm_shape(Malawi_constituencies)+
+  tm_polygons()
+```
+
+
+# Dissolving Data
+
+```{r, message=F, results=F, warning=F}
+# extract state population data from 2010 census
+usa_state_boundaries<-get_decennial(geography = "state", 
+                                     variables = "P001001",
+                                     year = 2010,
+                                     geometry=TRUE)
+```
+
+```{r}
+# Visualize state polygons
+tm_shape(usa_state_boundaries)+
+  tm_polygons()
+```
+
+```{r}
+# Remove Alaska, Hawaii, and Puerto Rico so that we only have continental USA
+continental_USA<-usa_state_boundaries %>% 
+                  filter(GEOID!="02" & GEOID!="15" & GEOID!="72")
+```
+
+```{r}
+# Visualize continental USA polygons
+tm_shape(continental_USA)+
+  tm_polygons()
+```
+
+
+```{r}
+# Define regional groups
+continental_USA_regions<-continental_USA %>% 
+  mutate(region=case_when(
+    (GEOID=="09"|GEOID=="23"|GEOID=="25"|GEOID=="33"|GEOID=="44"|
+       GEOID=="50")~"New England",
+    (GEOID=="10"|GEOID=="11"|GEOID=="24"|GEOID=="34"|
+       GEOID=="36"|GEOID=="42")~"Mideast",
+    (GEOID=="17"|GEOID=="18"|GEOID=="26"|GEOID=="39"|GEOID=="55")~
+      "Great Lakes",
+    (GEOID=="19"|GEOID=="20"|GEOID=="27"|GEOID==29|GEOID=="31"|
+       GEOID=="38"|GEOID=="46")~"Plains",
+    (GEOID=="01"|GEOID=="05"|GEOID=="12"|GEOID=="13"|
+       GEOID=="21"|GEOID=="22"|GEOID=="28"|GEOID=="37"|
+       GEOID=="45"|GEOID=="47"|GEOID=="51"|GEOID=="54")~"Southeast",
+    (GEOID=="04"|GEOID=="35"|GEOID=="40"|GEOID=="48")~"Southwest",
+    (GEOID=="08"|GEOID=="16"|GEOID=="30"|GEOID=="49"|
+       GEOID=="56")~"Rocky Mountain",
+    (GEOID=="06"|GEOID=="32"|GEOID=="41"|GEOID=="53")~"Far West"))
+```
+
+```{r}
+# Project "continental_USA_regions"
+continental_USA_regions_projected<-st_transform(continental_USA_regions, 5070)
+```
+
+```{r}
+continental_USA_regions_projected
+```
+
+```{r}
+continental_usa_dissolve<-continental_USA_regions_projected %>% 
+                              group_by(region) %>% 
+                              summarise()
+```
+
+```{r}
+tm_shape(continental_usa_dissolve)+
+  tm_polygons()
+```
+
+https://guides.library.duke.edu/r-geospatial/CRS
+https://mgimond.github.io/Spatial/vector-operations-in-r.html
+
+# Clipping polygons
+
+```{r}
+arbitrary_bounding_box<-
+  st_bbox(c(xmin=500000, xmax=1000000, ymin=1100000, ymax=2000000)) %>% 
+    st_as_sfc() %>% 
+    st_set_crs(5070)
+```
+
+```{r}
+tm_shape(continental_USA_regions_projected)+
+  tm_polygons()+
+tm_shape(arbitrary_bounding_box)+
+  tm_polygons(alpha=0, lwd=5)
+```
+
+```{r}
+states_bounding_box_intersection<-st_intersection(continental_USA_regions_projected, arbitrary_bounding_box)
+```
+
+```{r}
+tm_shape(states_bounding_box_intersection)+
+  tm_polygons()
+```
+
+```{r}
+states_bounding_box_intersect<-
+  continental_USA_regions_projected %>% 
+          st_filter(arbitrary_bounding_box, .predicate=st_intersects)
+```
+
+```{r}
+tm_shape(states_bounding_box_intersect)+
+  tm_polygons()
+```
+
+## Union 
+
+```{r}
+arbitrary_bounding_box<-
+  st_bbox(c(xmin=500000, xmax=1000000, ymin=1100000, ymax=2000000)) %>% 
+    st_as_sfc() %>% 
+    st_set_crs(5070)
+```
+
+```{r}
+arbitrary_bounding_box_two<-
+    st_bbox(c(xmin=75000, xmax=930000, ymin=1300000, ymax=2100000)) %>% 
+    st_as_sfc() %>% 
+    st_set_crs(5070)
+```
+
+
+```{r}
+tm_shape(continental_USA_regions_projected)+
+  tm_polygons()+
+tm_shape(arbitrary_bounding_box)+
+  tm_borders(lwd=5)+
+tm_shape(arbitrary_bounding_box_two)+
+  tm_borders("red", lwd=5)
+```
+
+```{r}
+bounding_box_union<-st_union(arbitrary_bounding_box, arbitrary_bounding_box_two)
+```
+
+```{r}
+tm_shape(continental_USA_regions_projected)+
+  tm_polygons()+
+tm_shape(bounding_box_union)+
+  tm_borders(lwd=5)
+```
+
+```{r}
+bounding_box_intersection<-st_intersection(arbitrary_bounding_box, arbitrary_bounding_box_two)
+```
+
+```{r}
+tm_shape(continental_USA_regions_projected)+
+  tm_polygons()+
+tm_shape(bounding_box_intersection)+
+  tm_borders(lwd=5)
+```
+
+## Inverse clip/Erase
+
+```{r}
+states_bounding_box_inverse<-st_difference(continental_USA_regions_projected, arbitrary_bounding_box)
+```
+
+```{r}
+tm_shape(states_bounding_box_inverse)+
+  tm_polygons()
+```
+
+https://cran.r-project.org/web/packages/sf/vignettes/sf4.html
+https://www.r-bloggers.com/2014/07/clipping-spatial-data-in-r/
+https://mgimond.github.io/Spatial/vector-operations-in-r.html#clipping-spatial-objects-using-other-spatial-objects
+
+# Geocoding
+
+```{r}
+CO_epa<-read_csv("https://www.dropbox.com/s/43pcrmvhs0dqcwv/STATE_SINGLE_CO.CSV?dl=1")
+```
+
+```{r}
+CO_epa_boulder<-CO_epa %>% filter(COUNTY_NAME=="BOULDER")
+```
+
+```{r, eval=F}
+CO_epa_boulder_geocoded_census<-CO_epa_boulder %>% 
+                            geocode(street=LOCATION_ADDRESS, city=CITY_NAME, postalcode = POSTAL_CODE, state=STATE_NAME, limit=1, method="census", full_results=TRUE)
+```
+
+```{r, echo=F, warning=F, message=F}
+CO_epa_boulder_geocoded_census<-read_csv("class_notes/class2/data/geocoded_dataset.csv")
+```
+
+```{r}
+CO_epa_boulder_points<-CO_epa_boulder_geocoded_census %>% 
+                        drop_na(long) %>% 
+                        st_as_sf(coords=c("long", "lat"), crs=4326)
+```
+
+```{r, message=F, warning=F, results=F}
+CO_counties<-get_decennial(geography = "county",
+                           state="CO",
+                           variables = "P001001",
+                           year = 2010,
+                           geometry=TRUE) %>% 
+                      st_transform(4326)
+```
+
+```{r}
+tm_shape(CO_counties)+
+  tm_polygons()+
+tm_shape(CO_epa_boulder_points)+
+  tm_dots()
+```
+
+```{r}
+boulder_county<-CO_counties %>% 
+                  filter(GEOID=="08013")
+```
+
+```{r}
+tm_shape(boulder_county)+
+  tm_polygons()+
+tm_shape(CO_epa_boulder_points)+
+  tm_dots("orange")
+```
+
+```{r}
+boulder_county_projected<-st_transform(boulder_county, 2231)
+CO_epa_boulder_points_projected<-st_transform(CO_epa_boulder_points, 2231)
+```
+
+```{r}
+tm_shape(boulder_county_projected)+
+  tm_polygons()+
+tm_shape(CO_epa_boulder_points_projected)+
+  tm_dots("orange")
+```
+
+```{r}
+CO_epa_boulder_points_cleaned<-
+  CO_epa_boulder_points_projected %>% 
+    st_filter(boulder_county_projected, .predicate=st_intersects)
+```
+
+```{r}
+tm_shape(boulder_county_projected)+
+  tm_polygons()+
+tm_shape(CO_epa_boulder_points_cleaned)+
+  tm_dots("orange")
+```
+
+# Distance and Area
+
+## Load data 
+```{r, echo=-11}
+setwd("class_notes/class2/data")
+download.file(url="https://geo.colorado.edu/apps/geolibrary/datasets/caiHospitals.zip", destfile="hospitals.zip")
+
+unzip(zipfile = "hospitals.zip")
+
+hospital_points<-st_read(dsn="CAI_Hospitals.shp")
+```
+
+```{r}
+hospital_points
+```
+
+```{r}
+tm_shape(CO_counties)+
+  tm_polygons()+
+tm_shape(hospital_points)+
+  tm_dots()
+```
+
+
+```{r}
+boulder_hospitals<-hospital_points %>% 
+                    filter(STCTYFIPS=="08013") %>% 
+                    st_transform(2231)
+```
+
+
+```{r}
+tm_shape(boulder_county_projected)+
+  tm_polygons()+
+tm_shape(boulder_hospitals)+
+  tm_dots()
+```
+
+## Extracting distances based on a single dataset
+
+```{r}
+boulder_hospital_distancematrix<-st_distance(boulder_hospitals)
+```
+
+```{r}
+boulder_hospital_distancematrix
+```
+
+```{r}
+rownames(boulder_hospital_distancematrix)<-boulder_hospitals$NAME
+colnames(boulder_hospital_distancematrix)<-boulder_hospitals$NAME
+
+boulder_hospital_distancematrix
+```
+
+```{r}
+boulder_hospital_distancematrix["Longmont United Hospital", "Boulder Community Hospital"]
+```
+
+## Extracting distances between features in different datasets
+
+[fire stations](https://opendata-bouldercounty.hub.arcgis.com/datasets/bouldercounty::fire-stations/about)
+
+```{r, echo=-1}
+setwd("class_notes/class2/data/fire_stations")
+boulder_fire_stations<-st_read("Fire_Stations.shp")
+```
+
+```{r}
+boulder_fire_stations
+```
+
+```{r}
+boulder_fire_stations_projected<-boulder_fire_stations %>%  
+                                    st_transform(2231)
+```
+
+```{r}
+boulder_hospital_firstation_distancematrix<-
+  st_distance(boulder_hospitals, boulder_fire_stations_projected)
+```
+
+```{r}
+firestations_hospitals<-
+  tm_shape(boulder_county_projected)+
+  tm_polygons()+
+tm_shape(boulder_fire_stations_projected)+
+  tm_dots("red", size=0.1)+
+tm_shape(boulder_hospitals)+
+  tm_dots("blue", size=0.1)
+
+firestations_hospitals
+```
+
+```{r}
+rownames(boulder_hospital_firstation_distancematrix)<-boulder_hospitals$NAME
+colnames(boulder_hospital_firstation_distancematrix)<-boulder_fire_stations_projected$Station_Na
+
+boulder_hospital_firstation_distancematrix
+```
+
+```{r, echo=F}
+boulder_hospital_firstation_distancematrix %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 1)
+
+))
+```
+
+```{r}
+boulder_hospital_firstation_distancematrix["Boulder Medical Center", "Nederland Station 2"]
+```
+
+```{r}
+boulder_hospital_firstation_distancematrix_df<-as.data.frame(boulder_hospital_firstation_distancematrix)
+```
+
+```{r}
+# distance to closest fire station for each hospital
+apply(boulder_hospital_firstation_distancematrix_df, 1, FUN=min)
+```
+
+```{r}
+# distance to closest hospital for each fire station
+apply(boulder_hospital_firstation_distancematrix_df, 2, FUN=min)
+```
+
+## Extracting areas
+
+```{r}
+# extracts area of Boulder county
+boulder_area<-st_area(boulder_county_projected)
+```
+
+```{r}
+boulder_area
+```
+
+```{r}
+boulder_area_km<-set_units(boulder_area, "km^2")
+```
+
+```{r}
+CO_tracts<-get_decennial(geography = "tract",
+                           state="CO",
+                           variables = "P001001",
+                           year = 2010,
+                           geometry=TRUE) %>% 
+                      st_transform(2231)
+```
+
+```{r}
+tm_shape(CO_tracts)+
+  tm_polygons()
+```
+
+```{r}
+boulder_tracts<-CO_tracts %>% 
+                  st_filter(boulder_county_projected, .predicate=st_intersects)
+```
+
+
+```{r}
+tm_shape(boulder_tracts)+
+  tm_polygons()+
+tm_shape(boulder_county_projected)+
+  tm_polygons("red", alpha=0.5)
+```
+
+
+```{r}
+boulder_tracts
+```
+
+```{r}
+# Turn off scientific notation
+options(scipen = 100)
+
+boulder_tract_areas<-boulder_tracts %>% 
+                      mutate(area=st_area(boulder_tracts))
+
+```
+
+```{r}
+units(boulder_tract_areas$area)<-"km^2"
+```
+
+```{r}
+boulder_tract_areas
+```
+
+
+# Distance Buffers
+
+https://geodacenter.github.io/opioid-environment-toolkit/buffer_analysis.html
+
+```{r}
+firestations_hospitals
+```
+
+```{r}
+hospital_buffers<-st_buffer(boulder_hospitals, dist=5280)
+```
+
+```{r}
+tm_shape(boulder_county_projected)+
+  tm_polygons()+
+tm_shape(boulder_hospitals)+
+  tm_dots("blue")+
+tm_shape(hospital_buffers)+
+  tm_borders(alpha=0.5, "blue", lwd=3)
+```
+
+```{r}
+fire_station_buffers<-st_buffer(boulder_fire_stations_projected, dist=5280)
+```
+
+```{r}
+tm_shape(boulder_county_projected)+
+  tm_polygons()+
+tm_shape(boulder_fire_stations_projected)+
+  tm_dots("red")+
+tm_shape(fire_station_buffers)+
+  tm_borders(alpha=0.5, "red", lwd=3)
+```
+
+```{r}
+tm_shape(boulder_county_projected)+
+  tm_polygons()+
+tm_shape(boulder_fire_stations_projected)+
+  tm_dots("red")+
+tm_shape(fire_station_buffers)+
+  tm_borders(alpha=0.5, "red", lwd=3)+
+tm_shape(boulder_hospitals)+
+  tm_dots("blue")+
+tm_shape(hospital_buffers)+
+  tm_borders(alpha=0.5, "blue", lwd=3)
+```
+
+```{r}
+hospital_firestation_intersection<-st_intersection(hospital_buffers, fire_station_buffers)
+```
+
+```{r}
+tm_shape(boulder_county_projected)+
+  tm_polygons()+
+tm_shape(hospital_firestation_intersection)+
+  tm_polygons("orange")
+```
+
+
+```{r}
+hospital_firestation_intersection_dissolve<-hospital_firestation_intersection %>% 
+                                            group_by() %>% 
+                                            summarise()
+```
+
+```{r}
+tm_shape(boulder_county_projected)+
+  tm_polygons()+
+tm_shape(hospital_firestation_intersection_dissolve)+
+  tm_polygons("orange")
+```
+
+```{r}
+fire_hospital_intersection_area<-st_area(hospital_firestation_intersection_dissolve)
+```
+
+```{r}
+fire_hospital_intersection_area
+```
+
+```{r}
+fire_hospital_intersection_area_sqmiles<-set_units(fire_hospital_intersection_area, "miles^2")
+
+fire_hospital_intersection_area_sqmiles
+```
+
+15.83 sq miles within Boulder County is within 1 mile of both a fire station AND a hospital
+
+```{r}
+hospital_firestation_union<-st_union(hospital_buffers, fire_station_buffers)
+```
+
+```{r}
+tm_shape(boulder_county_projected)+
+  tm_polygons()+
+tm_shape(hospital_firestation_union)+
+  tm_polygons("gold")
+```
+
+```{r}
+hospital_firestation_union_dissolve<-hospital_firestation_union %>% 
+                                            group_by() %>% 
+                                            summarise()
+```
+
+
+```{r}
+tm_shape(boulder_county_projected)+
+  tm_polygons()+
+tm_shape(hospital_firestation_union_dissolve)+
+  tm_polygons("gold")
+```
+
+
+```{r}
+hospital_firestation_union_area<-st_area(hospital_firestation_union_dissolve)
+
+hospital_firestation_union_area
+```
+
+```{r}
+hospital_firestation_union_area_sqmiles<-set_units(hospital_firestation_union_area, "miles^2")
+
+hospital_firestation_union_area_sqmiles
+```
+
+257 miles are within 1 mile of a fire station OR hospital
+
+## Merging shapefiles together 
+
+```{r}
+CO_tracts_test<-get_decennial(geography = "tract",
+                           state="CO",
+                           variables = "P001001",
+                           year = 2010,
+                           geometry=TRUE) %>% 
+                      st_transform(4326)
+```
+
+```{r}
+nm_counties<-get_decennial(geography = "county",
+                           state="NM",
+                           variables = "P001001",
+                           year = 2010,
+                           geometry=TRUE) %>% 
+                      st_transform(4326)
+```
+
+```{r}
+kk<-rbind(CO_tracts_test, nm_counties)
+```
+
+```{r}
+tm_shape(kk)+
+  tm_polygons()
+```
+
+
+
+continental_usa_dissolve<-continental_USA_regions_projected %>% 
+                              group_by(region) %>% 
+                              summarise()
+
+https://geobgu.xyz/r/geometric-operations-with-vector-layers.html#distance
+
+
+https://towardsdatascience.com/breaking-down-geocoding-in-r-a-complete-guide-1d0f8acd0d4b
+https://cran.r-project.org/web/packages/tidygeocoder/vignettes/tidygeocoder.html
+
+
+https://www.epa.gov/frs/epa-frs-facilities-state-single-file-csv-download
+https://www.epa.gov/frs/geospatial-data-download-service
+
+
+geocoding
+buffer
+spatial join
+intersect/union/overlap
+distance calculations
+area calculations
+coordinate systems 
+
+https://www.epa.gov/frs/epa-frs-facilities-state-single-file-csv-download
+
+latlong: https://www.britannica.com/science/latitude
+
+https://philmikejones.me/tutorials/2015-09-03-dissolve-polygons-in-r.html
+
+https://geobgu.xyz/r/geometric-operations-with-vector-layers.html
+
+https://github.com/r-spatial/sf/issues/290 
+
+https://mgimond.github.io/Spatial/vector-operations-in-r.html
+
+http://learnline.cdu.edu.au/units/ses101/env208/w5_files/GeoprocessingTools_handouts.pdf
+
+https://www.r-bloggers.com/2014/07/clipping-spatial-data-in-r/
+
+
+
+superfund dataset: https://dataverse.unc.edu/dataset.xhtml?persistentId=doi:10.15139/S3/4QEIGO
+
+https://glenbambrick.com/tag/map-projections/
+
+https://walker-data.com/census-r/spatial-analysis-with-us-census-data.html
+
+https://stackoverflow.com/questions/62442150/why-use-st-intersection-rather-than-st-intersects
+
+http://www.wvview.org/spatial_analytics/Visualizing_Spatial_Data/_site/Visualize_Spatial_Data.html
+
+https://datacornering.com/remove-scientific-notation-in-r/
