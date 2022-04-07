@@ -474,6 +474,7 @@ In the examples above, we layered distinct spatial datasets on top of each other
 The code below uses the *tidycensus* package to extract an sf object of Colorado census tract boundaries, along with data on tract-level population based on the 2010 census. The arguments to the ```get_decennial()``` function that extracts the data are fairly self-explanatory but it's worth noting a few things. First, to use *tidycensus* and extract information from the Census Bureau API, you must acquire a census API key, which you can do [here](https://api.census.gov/data/key_signup.html). This process is usually instantaneous. Second, to extract census variable codes (here, the code for population is "P001001"), you can generate a table of variables using the ```load_variables()``` function from *tidycensus*. Look up that function's documentation (```?load_variables()```) for more details. Third, if you want to extract the data as an sf object (i.e. a vector dataset), it is essential to specify ```geometry=TRUE```; setting this parameter to "FALSE" will return a regular data frame, without spatial information. Finally, note that we can reproject data by piping to ```st_transform()``` after extracting our data from ```get_decennial()```. We'll assign the data to an object named ```CO_census_tracts```:
 
 ```{r, message=F, results=F, warning=F}
+# extracts tract level data for Colorado and assigns to object named "CO_census_tracts"
 CO_census_tracts<-get_decennial(geography = "tract",
                            state="CO",
                            variables = "P001001",
@@ -485,12 +486,14 @@ CO_census_tracts<-get_decennial(geography = "tract",
 Now, let's go ahead and plot our vector layer: 
 
 ```{r}
+# Plots census tracts
 tm_shape(CO_census_tracts)+
   tm_polygons()
 ```
 Now, let's extract a county-level spatial dataset for New Mexico, using a similar procedure; we'll assign the extracted data to a new object named ```newmexico_counties```:
 
 ```{r, results=F, message=F, warning=F}
+# Extracts New Mexico counties
 newmexico_counties<-get_decennial(geography = "county",
                            state="NM",
                            variables = "P001001",
@@ -502,12 +505,14 @@ newmexico_counties<-get_decennial(geography = "county",
 If we plot these counties, it looks something like this: 
 
 ```{r}
+# Plots NM counties
 tm_shape(newmexico_counties)+
   tm_polygons()
 ```
 Let's now go ahead and plot our layers (Colorado census tracts and New Mexico counties) together:
 
 ```{r}
+# Prints CO census tracts and NM counties together
 tm_shape(CO_census_tracts)+
   tm_polygons()+
 tm_shape(newmexico_counties)+
@@ -517,12 +522,14 @@ tm_shape(newmexico_counties)+
 You'll notice that we don't have a good view of both our layers; we can see the very top sliver of New Mexico, but we'll need to "zoom out", which we can do by changing our bounding box. First, let's define our desired bounding box using the ```st_bbox()``` function, and assign the box to a new object named ```co_mex_bbox```:
 
 ```{r}
+# Defines bounding box
 co_mex_bbox<-st_bbox(c(xmin=-109.0603, xmax=-102.0415, ymin=31.3323, ymax=41.00344))
 ```
 
 Now, if we specify this bounding box within the ```tm_shape()``` function, the map will zoom out, and display both of our layers:
 
 ```{r}
+# Plots CO census tracts and NM counties using perspective set by "co_mex_bbox"
 tm_shape(CO_census_tracts, bbox=co_mex_bbox)+
   tm_polygons()+
 tm_shape(newmexico_counties)+
@@ -532,12 +539,14 @@ tm_shape(newmexico_counties)+
 However, it's important to emphasize that while these layers are plotted together, they remain distinct datasets. To integrate the datasets together, and map both CO tracts and NM counties as one integrated layer, we can use the ```rbind()``` function, and pass the names of the objects we want to combine as arguments; we'll assign this combined spatial dataset to a new object named ```CO_NM_combined```:
 
 ```{r}
+# Combines dataset of CO census tracts and NM counties into one dataset, and assigns to new object named "CO_NM_combined"
 CO_NM_combined<-rbind(CO_census_tracts, newmexico_counties)
 ```
 
 Now, we can confirm that our tracts and counties are in one dataset by plotting ```CO_NM_combined```:
 
 ```{r}
+# Plots CO_NM_combined
 tm_shape(CO_NM_combined)+
   tm_polygons()
 ```
@@ -549,7 +558,7 @@ It is often useful to transform vector datasets by dissolving their internal bou
 Let's first extract a state-level spatial dataset of population (based on the 2010 decennialc census) using *tidycensus*, project it into a projected coordinate reference system ([https://epsg.io/5070-1252](https://epsg.io/5070-1252), and assign it to an object named ```usa_state_boundaries```:
 
 ```{r, message=F, results=F, warning=F}
-# extract state population data from 2010 census
+# extracts state population data and state boundaries from 2010 census
 usa_state_boundaries<-get_decennial(geography = "state", 
                                      variables = "P001001",
                                      year = 2010,
@@ -568,7 +577,7 @@ tm_shape(usa_state_boundaries)+
 To make things somewhat easier by working only with the continental US states, let's remove Alaska, Hawaii, and Puerto Rico from the dataset using their census-defined GEOID codes. We'll assign the resulting data to a new object named ```continental_USA```:
 
 ```{r}
-# Remove Alaska, Hawaii, and Puerto Rico so that we only have continental USA
+# Removes Alaska, Hawaii, and Puerto Rico so that we only have continental USA
 continental_USA<-usa_state_boundaries %>% 
                   filter(GEOID!="02" & GEOID!="15" & GEOID!="72")
 ```
@@ -606,6 +615,7 @@ continental_USA_regions<-continental_USA %>%
 Now that we've added a categorical region variable to ```continental_USA_regions``` (which you can confirm by opening up the dataset with the ```View()``` function), let's now collapse the ```continental_USA_regions``` by region, using the ```group_by()``` and ```summarise()``` functions; we'll assigned this collapsed (i.e. "dissolved") dataset to a new object named ```continental_usa_dissolve```:
 
 ```{r}
+# Dissolves by region
 continental_usa_dissolve<-continental_USA_regions %>% 
                               group_by(region) %>% 
                               summarise()
@@ -614,6 +624,7 @@ continental_usa_dissolve<-continental_USA_regions %>%
 Let's take a look at the dataset:
 
 ```{r}
+# Views attribute table of regional dataset
 View(continental_usa_dissolve)
 ```
 
@@ -631,9 +642,11 @@ continental_usa_dissolve %>% datatable(extensions=c("Scroller", "FixedColumns"),
 And now, let's plot our new regional polygons:
 
 ```{r}
+# Plots regional groups
 tm_shape(continental_usa_dissolve)+
   tm_polygons()
 ```
+
 Now, we can add region-level data to our dataset, and visualize or analyze this information at this new scale. 
 
 ## Clipping vector data and finding intersections
@@ -641,6 +654,7 @@ Now, we can add region-level data to our dataset, and visualize or analyze this 
 It is often useful to clip one vector dataset with respect to another, or find geographic areas where different vector datasets intersect. To see this, let's first create an arbitrary bounding box (i.e. a rectangular polygon), and assign it to an object named ```arbitrary_bounding_box```:
 
 ```{r}
+# Creates bounding box using arbitrary coordinates
 arbitrary_bounding_box<-
   st_bbox(c(xmin=500000, xmax=1000000, ymin=1100000, ymax=2000000)) %>% 
     st_as_sfc() %>% 
