@@ -664,6 +664,7 @@ arbitrary_bounding_box<-
 Now, let's superimpose this bounding box on our previous plot of the continental USA (```continental_USA_regions```): 
 
 ```{r}
+# Plots USA state polygons and bounding box
 tm_shape(continental_USA_regions)+
   tm_polygons()+
 tm_shape(arbitrary_bounding_box)+
@@ -673,12 +674,14 @@ tm_shape(arbitrary_bounding_box)+
 Let's say we want to use this bounding box as a "cookie cutter", and carve out the exact area of ```continental_USA_regions``` that overlaps with the bounding box; to extract the exact extent of ```continental_USA_regions``` that is covered by ```arbitrary_bounding_box```, we can use the ```st_intersection()``` tool; below, we'll assign the product of the ```st_intersection(continental_USA_regions, arbitrary_bounding_box)``` to a new object named ```states_bounding_box_intersection```:
 
 ```{r}
+# Extracts intersection of "continental_USA_regions" and "arbitrary_bounding_box" and assigns to object named "states_bounding_box_intersection"
 states_bounding_box_intersection<-st_intersection(continental_USA_regions, arbitrary_bounding_box)
 ```
 
 Now, let's plot the new dataset we just created:
 
 ```{r}
+# Plots "states_bounding_box_intersection"
 tm_shape(states_bounding_box_intersection)+
   tm_polygons()
 ```
