@@ -49,7 +49,9 @@ doi: [https://doi.org/10.1089/env.2008.0547](https://doi.org/10.1089/env.2008.05
 * Jha, Saumitra. 2013. "Trade, Institutions, and Ethnic Tolerance: Evidence from South Asia". *American Political Science Review* 107(4): 806-832.\
 doi: [https://doi.org/10.1017/S0003055413000464](https://doi.org/10.1017/S0003055413000464)
 
-## Class notes
+## Class/Tutorial notes
+
+The class tutorial is available [here](class_notes/class2/class2_tutorial.html). 
 
 A link to the class notes will be available here soon after the class session. 
 

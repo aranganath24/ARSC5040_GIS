@@ -15,7 +15,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r, message=F, warning=F}
-library(WDI)
 library(sf)
 library(tmap)
 library(rnaturalearth)
@@ -29,130 +28,6 @@ library(units)
 
 ```{r, echo=F, warning=F}
 library(DT) 
-```
-
-# Scripting tools: functions and iteration with the tidyverse
-
-```{r}
-country_boundaries<-ne_countries(scale="medium", returnclass="sf") %>% 
-                       filter(iso_a3 !="ATA")
-                    
-```
-
-```{r}
-tm_shape(country_boundaries)+
-  tm_polygons()
-```
-
-```{r}
-trade_gdp_2010_2018<-WDI(country="all", # specifies we want data for all countries available
-                                indicator="NE.TRD.GNFS.ZS", # specifies code for desired indicator
-                                start=2010, # Start year for data series
-                                end=2018, # End year for data series
-                                extra=T) # returns
-```
-
-
-```{r}
-trade_gdp_2015<-
-  trade_gdp_2010_2018 %>%  # Establishes object to be modified
-  filter(year=="2015") %>% # Subsets observations where the "year" variable equals "2015"
-  rename(trade_gdp_2015=NE.TRD.GNFS.ZS)
-```
-
-```{r}
-trade_2015_spatial<-full_join(country_boundaries, trade_gdp_2015,
-                                    by=c("iso_a3"="iso3c"))
-```
-
-```{r}
-tm_shape(trade_2015_spatial)+
-  tm_polygons(col="trade_gdp_2015",
-              n=7,
-              style="quantile",
-              palette="YlOrBr",
-              title="Trade as a % of GDP,\n2015",
-              textNA="No Data")+
-    tm_layout(legend.outside=T,
-              legend.outside.position = "bottom",
-              main.title="Crossnational Variation in Commercial Integration, 2015",
-              main.title.size=1,
-              main.title.position="center",
-              inner.margins=c(0.06,0.10,0.10,0.08), # Sets margins to create whitespace
-              frame=FALSE,
-              attr.outside = TRUE)+ # Places credits section outside map
-   tm_credits("Map Author: Aditya Ranganath\nData Source: World Bank\nDevelopment Indicators (WDI)", position=c(0.78,0), size=0.38) # Specifies content, position, size of credits
-```
-
-```{r}
-wdi_map_maker<-function(wdi_variable_code, start_year, end_year, 
-                        legend.title, main_map_title){
-
-country_boundaries<-ne_countries(scale="medium", returnclass="sf") %>% 
-                       filter(iso_a3 !="ATA")
-  
-wdi_extract<-WDI(country="all",
-              indicator=wdi_variable_code,
-              start=start_year,
-              end=end_year,
-              extra=T)
-
-spatial_object_tomap<-full_join(country_boundaries, wdi_extract,
-                                    by=c("iso_a3"="iso3c"))
-
-final_map<-tm_shape(spatial_object_tomap)+
-  tm_polygons(col=wdi_variable_code,
-              n=7,
-              style="quantile",
-              palette="YlOrBr",
-              title=legend.title,
-              textNA="No Data")+
-    tm_layout(legend.outside=T,
-              legend.outside.position = "bottom",
-              main.title=main_map_title,
-              main.title.size=1,
-              main.title.position="center",
-              inner.margins=c(0.06,0.10,0.10,0.08), # Sets margins to create whitespace
-              frame=FALSE,
-              attr.outside = TRUE)+ # Places credits section outside map
-   tm_credits("Map Author: Aditya Ranganath\nData Source: World Bank\nDevelopment Indicators (WDI)", position=c(0.78,0), size=0.38) # Specifies content, position, size of credits
-return(final_map)
-}
-```
-
-
-```{r}
-wdi_map_maker(wdi_variable_code="BG.GSR.NFSV.GD.ZS", start_year=2017, end_year=2017, 
-                        legend.title="Services Trade (% of GDP)", main_map_title="Service Market Integration, 2017")
-```
-
-
-```{r}
-wdi_map_maker(wdi_variable_code="GC.TAX.TOTL.GD.ZS", start_year=2017, end_year=2017, 
-                        legend.title="Taxes (% of GDP)", main_map_title="Government Taxes as a Share of GDP, 2017")
-```
-
-
-```{r}
-input_list<-list(wdi_variable_code=c("BG.GSR.NFSV.GD.ZS", "GC.TAX.TOTL.GD.ZS"),
-                 start_year=c(2017, 2017),
-                 end_year=c(2017, 2017),
-                 legend.title=c("Services Trade (% of GDP)", "Taxes (%GDP)"),
-                 main_map_title=c("Service Market Integration, 2017", "Government Taxes as a Share of GDP, 2017")) 
-```
-
-
-```{r}
-map_list<-pmap(input_list, wdi_map_maker)
-```
-
-
-```{r}
-map_list[[1]]
-```
-
-```{r}
-map_list[[2]]
 ```
 
 # Layering Data 
@@ -572,9 +447,9 @@ In addition to using GIS tools to analyze vector datasets in terms of their spat
 
 In the examples above, we layered distinct spatial datasets on top of each other. We can also situate distinct datasets next to each other. Let's consider an example closer to home. 
 
-The code below 
+The code below uses the *tidycensus* package to extract an sf object of Colorado census tract boundaries, along with data on tract-level population based on the 2010 census. The arguments to the ```get_decennial()``` function that extracts the data are fairly self-explanatory but it's worth noting a few things. First, to use *tidycensus* and extract information from the Census Bureau API, you must acquire a census API key, which you can do [here](https://api.census.gov/data/key_signup.html). This process is usually instantaneous. Second, to extract census variable codes (here, the code for population is "P001001"), you can generate a table of variables using the ```load_variables()``` function from *tidycensus*. Look up that function's documentation (```?load_variables()```) for more details. Third, if you want to extract the data as an sf object (i.e. a vector dataset), it is essential to specify ```geometry=TRUE```; setting this parameter to "FALSE" will return a regular data frame, without spatial information. Finally, note that we can reproject data by piping to ```st_transform()``` after extracting our data from ```get_decennial()```. We'll assign the data to an object named ```CO_census_tracts```:
 
-```{r}
+```{r, message=F, results=F, warning=F}
 CO_census_tracts<-get_decennial(geography = "tract",
                            state="CO",
                            variables = "P001001",
@@ -583,12 +458,15 @@ CO_census_tracts<-get_decennial(geography = "tract",
                       st_transform(4326)
 ```
 
+Now, let's go ahead and plot our vector layer: 
+
 ```{r}
 tm_shape(CO_census_tracts)+
   tm_polygons()
 ```
+Now, let's extract a county-level spatial dataset for New Mexico, using a similar procedure; we'll assign the extracted data to a new object named ```newmexico_counties```:
 
-```{r}
+```{r, results=F, message=F, warning=F}
 newmexico_counties<-get_decennial(geography = "county",
                            state="NM",
                            variables = "P001001",
@@ -597,10 +475,13 @@ newmexico_counties<-get_decennial(geography = "county",
                       st_transform(4326)
 ```
 
+If we plot these counties, it looks something like this: 
+
 ```{r}
 tm_shape(newmexico_counties)+
   tm_polygons()
 ```
+Let's now go ahead and plot our layers (Colorado census tracts and New Mexico counties) together:
 
 ```{r}
 tm_shape(CO_census_tracts)+
@@ -609,9 +490,13 @@ tm_shape(newmexico_counties)+
   tm_polygons()
 ```
 
+You'll notice that we don't have a good view of both our layers; we can see the very top sliver of New Mexico, but we'll need to "zoom out", which we can do by changing our bounding box. First, let's define our desired bounding box using the ```st_bbox()``` function, and assign the box to a new object named ```co_mex_bbox```:
+
 ```{r}
 co_mex_bbox<-st_bbox(c(xmin=-109.0603, xmax=-102.0415, ymin=31.3323, ymax=41.00344))
 ```
+
+Now, if we specify this bounding box within the ```tm_shape()``` function, the map will zoom out, and display both of our layers:
 
 ```{r}
 tm_shape(CO_census_tracts, bbox=co_mex_bbox)+
@@ -620,9 +505,13 @@ tm_shape(newmexico_counties)+
   tm_polygons()
 ```
 
+However, it's important to emphasize that while these layers are plotted together, they remain distinct datasets. To integrate the datasets together, and map both CO tracts and NM counties as one integrated layer, we can use the ```rbind()``` function, and pass the names of the objects we want to combine as arguments; we'll assign this combined spatial dataset to a new object named ```CO_NM_combined```:
+
 ```{r}
 CO_NM_combined<-rbind(CO_census_tracts, newmexico_counties)
 ```
+
+Now, we can confirm that our tracts and counties are in one dataset by plotting ```CO_NM_combined```:
 
 ```{r}
 tm_shape(CO_NM_combined)+
@@ -631,13 +520,20 @@ tm_shape(CO_NM_combined)+
 
 ## Dissolving vector datasets
 
+It is often useful to transform vector datasets by dissolving their internal boundaries, which effectively allows us to visualize or analyze data at different scales. To see how this works, let's transform a state-level polygon dataset of continental US states into a regional dataset by dissolving state boundaries. 
+
+Let's first extract a state-level spatial dataset of population (based on the 2010 decennialc census) using *tidycensus*, project it into a projected coordinate reference system ([https://epsg.io/5070-1252](https://epsg.io/5070-1252), and assign it to an object named ```usa_state_boundaries```:
+
 ```{r, message=F, results=F, warning=F}
 # extract state population data from 2010 census
 usa_state_boundaries<-get_decennial(geography = "state", 
                                      variables = "P001001",
                                      year = 2010,
-                                     geometry=TRUE)
+                                     geometry=TRUE) %>% 
+                        st_transform(5070)
 ```
+
+Let's now plot these boundaries:
 
 ```{r}
 # Visualize state polygons
@@ -645,18 +541,22 @@ tm_shape(usa_state_boundaries)+
   tm_polygons()
 ```
 
+To make things somewhat easier by working only with the continental US states, let's remove Alaska, Hawaii, and Puerto Rico from the dataset using their census-defined GEOID codes. We'll assign the resulting data to a new object named ```continental_USA```:
+
 ```{r}
 # Remove Alaska, Hawaii, and Puerto Rico so that we only have continental USA
 continental_USA<-usa_state_boundaries %>% 
                   filter(GEOID!="02" & GEOID!="15" & GEOID!="72")
 ```
 
+Now, let's plot ```continental_USA```: 
+
 ```{r}
 # Visualize continental USA polygons
 tm_shape(continental_USA)+
   tm_polygons()
 ```
-
+Let's say we want to transform this into a regional map, with the regions defined by the Bureau of Economic Analysis regional groupings (see [here](https://en.wikipedia.org/wiki/List_of_regions_of_the_United_States#Bureau_of_Economic_Analysis_regions)). We'll take ```continental_USA```, and then create a new variable named "region" using the ```mutate()``` function. Within ```mutate()```, we'll use the ```case_when()``` function to populate the newly-created "region" column with a certain region's name if states meet a certain condition. For example, if states have ````GEOID=="09"|GEOID=="23"|GEOID=="25"|GEOID=="33"|GEOID=="44"|GEOID=="50"```, their value for the "region" variable will be "New England", since these are all New England states (and so on for other states/regions). We'll assign the dataset with the newly created "region" variable to a new object named ```continental_USA_regions```:
 
 ```{r}
 # Define regional groups
@@ -679,30 +579,42 @@ continental_USA_regions<-continental_USA %>%
     (GEOID=="06"|GEOID=="32"|GEOID=="41"|GEOID=="53")~"Far West"))
 ```
 
-```{r}
-# Project "continental_USA_regions"
-continental_USA_regions_projected<-st_transform(continental_USA_regions, 5070)
-```
+Now that we've added a categorical region variable to ```continental_USA_regions``` (which you can confirm by opening up the dataset with the ```View()``` function), let's now collapse the ```continental_USA_regions``` by region, using the ```group_by()``` and ```summarise()``` functions; we'll assigned this collapsed (i.e. "dissolved") dataset to a new object named ```continental_usa_dissolve```:
 
 ```{r}
-continental_USA_regions_projected
-```
-
-```{r}
-continental_usa_dissolve<-continental_USA_regions_projected %>% 
+continental_usa_dissolve<-continental_USA_regions %>% 
                               group_by(region) %>% 
                               summarise()
 ```
+
+Let's take a look at the dataset:
+
+```{r}
+View(continental_usa_dissolve)
+```
+
+```{r, echo=F}
+continental_usa_dissolve %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+And now, let's plot our new regional polygons:
 
 ```{r}
 tm_shape(continental_usa_dissolve)+
   tm_polygons()
 ```
+Now, we can add region-level data to our dataset, and visualize or analyze this information at this new scale. 
 
-https://guides.library.duke.edu/r-geospatial/CRS
-https://mgimond.github.io/Spatial/vector-operations-in-r.html
+## Clipping vector data and finding intersections
 
-# Clipping polygons
+It is often useful to clip one vector dataset with respect to another, or find geographic areas where different vector datasets intersect. To see this, let's first create an arbitrary bounding box (i.e. a rectangular polygon), and assign it to an object named ```arbitrary_bounding_box```:
 
 ```{r}
 arbitrary_bounding_box<-
@@ -711,41 +623,46 @@ arbitrary_bounding_box<-
     st_set_crs(5070)
 ```
 
+Now, let's superimpose this bounding box on our previous plot of the continental USA (```continental_USA_regions```): 
+
 ```{r}
-tm_shape(continental_USA_regions_projected)+
+tm_shape(continental_USA_regions)+
   tm_polygons()+
 tm_shape(arbitrary_bounding_box)+
   tm_polygons(alpha=0, lwd=5)
 ```
 
+Let's say we want to use this bounding box as a "cookie cutter", and carve out the exact area of ```continental_USA_regions``` that overlaps with the bounding box; to extract the exact extent of ```continental_USA_regions``` that is covered by ```arbitrary_bounding_box```, we can use the ```st_intersection()``` tool; below, we'll assign the product of the ```st_intersection(continental_USA_regions, arbitrary_bounding_box)``` to a new object named ```states_bounding_box_intersection```:
+
 ```{r}
-states_bounding_box_intersection<-st_intersection(continental_USA_regions_projected, arbitrary_bounding_box)
+states_bounding_box_intersection<-st_intersection(continental_USA_regions, arbitrary_bounding_box)
 ```
+
+Now, let's plot the new dataset we just created:
 
 ```{r}
 tm_shape(states_bounding_box_intersection)+
   tm_polygons()
 ```
+If, instead of using ```arbitrary_bounding_box``` as a cookie cutter, we want to extract the full extent of all of the state polygons that intersect with the bounding box (so that the full extent of states that are partially within the bounding box is returned), we can instead use the ```st_filter()``` function with the ```st_intersects()``` predicate. Below, we first take ```continental_USA_regions```, and then use ```st_filter(arbitrary_bounding_box, .predicate=st_intersects)``` to extract all of the polygons within that dataset which intersect with the bounding box; we'll assign these polygons to a new object named ```states_bounding_box_intersect```:
 
 ```{r}
 states_bounding_box_intersect<-
-  continental_USA_regions_projected %>% 
+  continental_USA_regions %>% 
           st_filter(arbitrary_bounding_box, .predicate=st_intersects)
 ```
+
+Now, let's plot ```states_bounding_box_intersect```: 
 
 ```{r}
 tm_shape(states_bounding_box_intersect)+
   tm_polygons()
 ```
+Note the difference from the earlier plot; instead of using the bounding box as a cookie cutter, it returns all of the polygons that intersect with the bounding box. 
 
-## Union 
+## Finding the union between vector datasets
 
-```{r}
-arbitrary_bounding_box<-
-  st_bbox(c(xmin=500000, xmax=1000000, ymin=1100000, ymax=2000000)) %>% 
-    st_as_sfc() %>% 
-    st_set_crs(5070)
-```
+The intersection between two vector datasets is the geographic area that is common to both (i.e. areas that are in BOTH datasets, at the point of overlap). The union between two vector datasets is the area in *either* dataset (i.e. the point of overlap AND areas that are unique to each). To see this visually, let's first create another arbitrary bounding box, named ```arbitrary_bounding_box_two```:
 
 ```{r}
 arbitrary_bounding_box_two<-
@@ -754,33 +671,40 @@ arbitrary_bounding_box_two<-
     st_set_crs(5070)
 ```
 
+Now, let's plot both bounding boxes against ```continental_USA_regions```:
 
 ```{r}
-tm_shape(continental_USA_regions_projected)+
+tm_shape(continental_USA_regions)+
   tm_polygons()+
 tm_shape(arbitrary_bounding_box)+
   tm_borders(lwd=5)+
 tm_shape(arbitrary_bounding_box_two)+
   tm_borders("red", lwd=5)
 ```
+Let's now compute the geometric union between these bounding boxes using the ```st_union()``` function, and assign it to a new object named ```bounding_box_union```:
 
 ```{r}
 bounding_box_union<-st_union(arbitrary_bounding_box, arbitrary_bounding_box_two)
 ```
 
+Now, let's plot ```bounding_box_union``` against the backdrop of the states:
+
 ```{r}
-tm_shape(continental_USA_regions_projected)+
+tm_shape(continental_USA_regions)+
   tm_polygons()+
 tm_shape(bounding_box_union)+
   tm_borders(lwd=5)
 ```
+Let's now contrast the area defined by the union with the area that is defined by the intersection. First, we'll compute the intersection of our two bounding boxes, and assign it to an object named ```bounding_box_intersection```: 
 
 ```{r}
 bounding_box_intersection<-st_intersection(arbitrary_bounding_box, arbitrary_bounding_box_two)
 ```
 
+Now, let's view the intersection (i.e. the area of overlap between the two boxes): 
+
 ```{r}
-tm_shape(continental_USA_regions_projected)+
+tm_shape(continental_USA_regions)+
   tm_polygons()+
 tm_shape(bounding_box_intersection)+
   tm_borders(lwd=5)
@@ -789,7 +713,7 @@ tm_shape(bounding_box_intersection)+
 ## Inverse clip/Erase
 
 ```{r}
-states_bounding_box_inverse<-st_difference(continental_USA_regions_projected, arbitrary_bounding_box)
+states_bounding_box_inverse<-st_difference(continental_USA_regions, arbitrary_bounding_box)
 ```
 
 ```{r}
@@ -797,19 +721,27 @@ tm_shape(states_bounding_box_inverse)+
   tm_polygons()
 ```
 
-https://cran.r-project.org/web/packages/sf/vignettes/sf4.html
-https://www.r-bloggers.com/2014/07/clipping-spatial-data-in-r/
-https://mgimond.github.io/Spatial/vector-operations-in-r.html#clipping-spatial-objects-using-other-spatial-objects
+# Creating GIS Data: Geocoding
 
-# Geocoding
+Let's say that you have a dataset that contains addresses associated with observations of interest, and you want to represent these locations on a digital map. GIS software cannot directly plot address information; in order to plot those addresses in a GIS framework, you first have to convert those addresses into lat/long coordinates that can be interpreted by GIS software. The process of converting address data to lat/long coordinates is known as geocoding.
+
+Geocoding is a complex topic, and there is a lot going on under the hood of geocoding software; if geocoding is important to your project, you'll want to read up on the topic and research various Geocoding options in order to maximize the accuracy and coverage of your geocodes. For now, we'll set aside these issues, and look at a practical example of how to geocode a dataset in R. We will geocode our data with the help of functions that are part of the *tidygeocoder* package. *tidygeocoder* provides access to multiple geocoding APIs; in this example, we'll use a free geocoding utility provided by the US census (which we can access via *tidygeocoder*).
+
+The dataset we'll work with is an EPA dataset for the state of Colorado. It contains information about entities in the EPA's Facility Registry System (i.e. facilities or sites subject to environmental regulation). The data is available [here](https://www.epa.gov/frs/epa-frs-facilities-state-single-file-csv-download). The EPA datasets already contain lat/long information, but for the sake of illustration, we'll pretend that they do not, and generate the lat/longs through the geocoding process. A version of the dataset (without the original lat/longs), and which would be best to use, is available at this location: [https://www.dropbox.com/sh/mdjj5sj0owh7quj/AABfiSF9QmLCiC_6QIvH0URva?dl=0](https://www.dropbox.com/sh/mdjj5sj0owh7quj/AABfiSF9QmLCiC_6QIvH0URva?dl=0).
+
+You can also read in the dataset directly into R using the link below; we'll assign the dataset to an object named ```CO_epa```: 
 
 ```{r}
 CO_epa<-read_csv("https://www.dropbox.com/s/43pcrmvhs0dqcwv/STATE_SINGLE_CO.CSV?dl=1")
 ```
 
+After opening up the dataset and viewing its contents, let's filter our dataset, and confine our attention to Boulder County. We'll assign the subsetted data to a new object named ```CO_epa_boulder```:
+
 ```{r}
 CO_epa_boulder<-CO_epa %>% filter(COUNTY_NAME=="BOULDER")
 ```
+
+Now, let's use the address information in the dataset to attach lat/long coordinates to the Boulder EPA sites. We can do so using the ```geocode()``` function from *tidygeocoder*. The code below takes ```CO_epa_boulder```, and then applies the ```geocode()``` function. The parameters link the various address fields in the dataset to address components (such as "street", "city" etc). The other important argument is "method", where we specify that we want to geocode the dataset using the Census geocoder, which you can learn more about [here](https://www2.census.gov/geo/pdfs/maps-data/data/FAQ_for_Census_Bureau_Public_Geocoder.pdf). Setting ```full_results=TRUE``` will return information about the accuracy of the geocodes. We'll assign the new dataset with the geocodes to an object named ```CO_epa_boulder_geocoded_census```:
 
 ```{r, eval=F}
 CO_epa_boulder_geocoded_census<-CO_epa_boulder %>% 
@@ -820,11 +752,15 @@ CO_epa_boulder_geocoded_census<-CO_epa_boulder %>%
 CO_epa_boulder_geocoded_census<-read_csv("class_notes/class2/data/geocoded_dataset.csv")
 ```
 
+If you open the dataset, you'll note that we now have lat/long information that can be used to create a spatial object. It's not possible to create a spatial object using a data frame with NA values in the lat/long fields, so we'll drop these rows using ```drop_na(long)```. The code that reads ```  st_as_sf(coords=c("long", "lat"), crs=4269)``` creates the spatial object using the lat/long information; note the ```crs=4269```; usually, the lat/long coordinates returned by geocoders are in WGS84 (i.e. EPSG=4326), but the Census geocoder returns coordinates using NAD83, which corresponds to the CRS with epsg=4269. 
+
 ```{r}
 CO_epa_boulder_points<-CO_epa_boulder_geocoded_census %>% 
                         drop_na(long) %>% 
-                        st_as_sf(coords=c("long", "lat"), crs=4326)
+                        st_as_sf(coords=c("long", "lat"), crs=4269)
 ```
+
+Let's now extract a map of Colorado counties in the same CRS, and assign it to an object named ```CO_counties```:
 
 ```{r, message=F, warning=F, results=F}
 CO_counties<-get_decennial(geography = "county",
@@ -832,8 +768,11 @@ CO_counties<-get_decennial(geography = "county",
                            variables = "P001001",
                            year = 2010,
                            geometry=TRUE) %>% 
-                      st_transform(4326)
+                      st_transform(4269)
 ```
+
+And now, let's map the locations of the Boulder EPA sites against a plot of CO counties:
+
 
 ```{r}
 tm_shape(CO_counties)+
@@ -842,10 +781,14 @@ tm_shape(CO_epa_boulder_points)+
   tm_dots()
 ```
 
+Instead of mapping the points with respect to all of the counties in Colorado, let's map our points with respect to Boulder in particular. First, let's extract Boulder County from ```CO_counties``` and assign it to an object named ```boulder_county```:
+
 ```{r}
 boulder_county<-CO_counties %>% 
                   filter(GEOID=="08013")
 ```
+
+Now, let's plot ```CO_epa_boulder_points``` against ```boulder_county```:
 
 ```{r}
 tm_shape(boulder_county)+
@@ -853,24 +796,24 @@ tm_shape(boulder_county)+
 tm_shape(CO_epa_boulder_points)+
   tm_dots("orange")
 ```
+You'll notice that some of the locations fall out of the area delimited by the Boulder county polygon; this could be due to error of various kinds. Instead of diagnosing it, let's just say you want to clip out the points outside of Boulder. 
+
+First, let's project both of our datasets into a projection that is more suited to Boulder County, since we'll eventually perform some spatial calculations on this data, and it is important to be in a projected coordinate system for these purposes. The projection we'll use is associated with the EPSG code 2221; see more information [here](https://epsg.io/2231). We'll assign both reprojected datasets to new objects, as below:
 
 ```{r}
 boulder_county_projected<-st_transform(boulder_county, 2231)
 CO_epa_boulder_points_projected<-st_transform(CO_epa_boulder_points, 2231)
 ```
 
-```{r}
-tm_shape(boulder_county_projected)+
-  tm_polygons()+
-tm_shape(CO_epa_boulder_points_projected)+
-  tm_dots("orange")
-```
+Now, let's filter out the observations that intersect the Boulder polygon. We'll take ```CO_epa_boulder_points_projected```, and then use ```st_filter(boulder_county_projected, .predicate=st_intersects)``` to extract the points that intersect the Boulder polygon; this will remove the observations that fall outside Boulder. We'll assign this spatially filtered data to a new object named ```CO_epa_boulder_points_cleaned```: 
 
 ```{r}
 CO_epa_boulder_points_cleaned<-
   CO_epa_boulder_points_projected %>% 
     st_filter(boulder_county_projected, .predicate=st_intersects)
 ```
+
+Now, let's map this new object: 
 
 ```{r}
 tm_shape(boulder_county_projected)+
@@ -879,9 +822,18 @@ tm_shape(CO_epa_boulder_points_cleaned)+
   tm_dots("orange")
 ```
 
+Note that the points falling out of Boulder have been removed. 
+
 # Distance and Area
 
-## Load data 
+Distance and area are important geographic concepts that are often relevant when studying social phenomena. This section reviews some basic GIS tools to extract information about these spatial variables. 
+
+## Generating a distance matrix
+
+Since we're already in Boulder, let's continue working with Boulder-specific data. 
+
+Let's explore a spatial dataset of Colorado hospitals from the Colorado GeoLibrary, available [here](https://geo.colorado.edu/catalog/47540-5c7d4e3a8904a4000bf4d974). You can download the spatial dataset (in shapefile format) to your working directory, and read it in using the ```st_read()``` function. However, it's worth noting that it's also possible to download and read in data from an online source programmatically; in this case, we can do so with the following code:
+
 ```{r, echo=-11}
 setwd("class_notes/class2/data")
 download.file(url="https://geo.colorado.edu/apps/geolibrary/datasets/caiHospitals.zip", destfile="hospitals.zip")
@@ -891,9 +843,7 @@ unzip(zipfile = "hospitals.zip")
 hospital_points<-st_read(dsn="CAI_Hospitals.shp")
 ```
 
-```{r}
-hospital_points
-```
+Now that the point layer of hospitals has been read into R and assigned to the ```hospital_points()``` object, go ahead and view the data's attributes using the ```View()``` function. Then, let's plot the hospital locations against the backdrop of Colorado counties:
 
 ```{r}
 tm_shape(CO_counties)+
@@ -902,6 +852,7 @@ tm_shape(hospital_points)+
   tm_dots()
 ```
 
+If we'd like to confine our analysis to Boulder, let's extract the Boulder hospital observations based on the Boulder county code (08013), and then project those observations into the Boulder projection using ```st_transform()```. We'll assign the new dataset of Boulder hospitals to an object named ```boulder_hospitals```: 
 
 ```{r}
 boulder_hospitals<-hospital_points %>% 
@@ -909,6 +860,7 @@ boulder_hospitals<-hospital_points %>%
                     st_transform(2231)
 ```
 
+Let's go ahead and plot the Boulder hospital data:
 
 ```{r}
 tm_shape(boulder_county_projected)+
@@ -917,22 +869,37 @@ tm_shape(boulder_hospitals)+
   tm_dots()
 ```
 
-## Extracting distances based on a single dataset
+Now, let's say we want to calculate the Euclidean distance between all of the hospitals. We can use the ```st_distance()``` function to generate a distance matrix. We'll assign the matrix to an object named ```boulder_hospital_distancematrix```:
 
 ```{r}
 boulder_hospital_distancematrix<-st_distance(boulder_hospitals)
 ```
 
-```{r}
-boulder_hospital_distancematrix
-```
-
+To make things easier to interpret, we'll assign names to the Matrix rows and columns:
 ```{r}
 rownames(boulder_hospital_distancematrix)<-boulder_hospitals$NAME
 colnames(boulder_hospital_distancematrix)<-boulder_hospitals$NAME
-
-boulder_hospital_distancematrix
 ```
+
+Now, let's take a look at our distance Matrix, which provides information on the pairwise Euclidean distances between all of the hospitals in the dataset. 
+
+```{r}
+View(boulder_hospital_distancematrix)
+```
+
+```{r}
+boulder_hospital_distancematrix %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 1)
+
+))
+```
+
+We can easily use this matrix to extract quantities of interest. For example, let's say we want to extract the distance between "Longmont United Hospital" and "Boulder Community Hospital". We can do so with the following: 
 
 ```{r}
 boulder_hospital_distancematrix["Longmont United Hospital", "Boulder Community Hospital"]
@@ -940,26 +907,21 @@ boulder_hospital_distancematrix["Longmont United Hospital", "Boulder Community H
 
 ## Extracting distances between features in different datasets
 
-[fire stations](https://opendata-bouldercounty.hub.arcgis.com/datasets/bouldercounty::fire-stations/about)
+We can also extract information about distances between points in different datasets. To see this, let's bring in another dataset, on the location of Boulder County fire stations, which is available on the Boulder County GIS Data website [here](https://opendata-bouldercounty.hub.arcgis.com/datasets/bouldercounty::fire-stations/about). Go ahead and read this data into R Studio, and assign it to an object named ```boulder_fire_stations```:
 
 ```{r, echo=-1}
 setwd("class_notes/class2/data/fire_stations")
 boulder_fire_stations<-st_read("Fire_Stations.shp")
 ```
 
-```{r}
-boulder_fire_stations
-```
+Let's reproject the fire station data into EPSG:2231, and assign the reprojected data to an object named ```boulder_fire_stations_projected```:
 
 ```{r}
 boulder_fire_stations_projected<-boulder_fire_stations %>%  
                                     st_transform(2231)
 ```
 
-```{r}
-boulder_hospital_firstation_distancematrix<-
-  st_distance(boulder_hospitals, boulder_fire_stations_projected)
-```
+We can plot our fire stations and hospitals (in different colors) against the backdrop of the Boulder county polygon:
 
 ```{r}
 firestations_hospitals<-
@@ -973,11 +935,24 @@ tm_shape(boulder_hospitals)+
 firestations_hospitals
 ```
 
+Now, if we want to extract a distance matrix that contains the Euclidean distances between each of the hospitals in Boulder, and each of the fire stations, we can pass the names of the relevant objects to ```st_join```. We'll assign the matrix to an object named ```boulder_hospital_firstation_distancematrix```: 
+
+```{r}
+boulder_hospital_firstation_distancematrix<-
+  st_distance(boulder_hospitals, boulder_fire_stations_projected)
+```
+
+For ease of interpretation, we'll name the Matrix rows after the hospital names, and the matrix columns after the fire station names: 
+
 ```{r}
 rownames(boulder_hospital_firstation_distancematrix)<-boulder_hospitals$NAME
 colnames(boulder_hospital_firstation_distancematrix)<-boulder_fire_stations_projected$Station_Na
+```
 
-boulder_hospital_firstation_distancematrix
+Now, let's open up our matrix: 
+
+```{r}
+View(boulder_hospital_firstation_distancematrix)
 ```
 
 ```{r, echo=F}
@@ -992,38 +967,105 @@ boulder_hospital_firstation_distancematrix %>% datatable(extensions=c("Scroller"
 ))
 ```
 
+We can use the same notation to extract information from the distance matrix. Let's say we want to find the distance between "Boulder Medical Center" and "Nederland Station 2": 
+
 ```{r}
 boulder_hospital_firstation_distancematrix["Boulder Medical Center", "Nederland Station 2"]
 ```
+
+With a bit of data wrangling, we can also extract more complicated information. For example, let's say we want to find out the distance of the closest fire station to each hospital, and then find out the distance of the closest hospital to each fire station. The easiest way to do this is to first turn the matrix into a data frame:
 
 ```{r}
 boulder_hospital_firstation_distancematrix_df<-as.data.frame(boulder_hospital_firstation_distancematrix)
 ```
 
+Then, to find the smallest value for each row (which will yield the distance to the closest fire station for each hospital), we can use the following:
+
 ```{r}
 # distance to closest fire station for each hospital
-apply(boulder_hospital_firstation_distancematrix_df, 1, FUN=min)
+HOSPITAL_closest_fire_station<-apply(boulder_hospital_firstation_distancematrix_df, 1, FUN=min)
 ```
+
+```{r, echo=T}
+HOSPITAL_closest_fire_station<-as.data.frame(HOSPITAL_closest_fire_station)
+```
+
+To find the smallest value for each column (which yields the distance to the closest hospital for each fire station), we can use the following:
 
 ```{r}
 # distance to closest hospital for each fire station
-apply(boulder_hospital_firstation_distancematrix_df, 2, FUN=min)
+FIRESTATION_closest_hospital<-apply(boulder_hospital_firstation_distancematrix_df, 2, FUN=min)
+```
+
+```{r, echo=F}
+FIRESTATION_closest_hospital<-as.data.frame(FIRESTATION_closest_hospital)
+```
+
+Let's view these datasets:
+
+```{r}
+View(HOSPITAL_closest_fire_station)
+```
+
+```{r}
+HOSPITAL_closest_fire_station %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 1)
+
+))
+```
+
+```{r}
+View(FIRESTATION_closest_hospital)
+```
+
+```{r}
+FIRESTATION_closest_hospital %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 1)
+
+))
 ```
 
 ## Extracting areas
+
+Now, let's turn to the process of extracting information about the areas delineated by polygon datasets. 
+We can extract areas using the ```st_area()``` function. For example, let's say we want to find the area of Boulder County; we can simply pass the projected Boulder County polygon to ```st_area(). Below, we'll assign this value to the object named ```boulder_area```:
 
 ```{r}
 # extracts area of Boulder county
 boulder_area<-st_area(boulder_county_projected)
 ```
 
+Now, let's print the value assigned to ```boulder_area```: 
+
 ```{r}
 boulder_area
 ```
 
+Note that the units will always be in the units associated with the data's projection (in this case, feet). This is a bit unwieldy, however; let's say we want the area in kilometers squared. To change the units, we can use the ```set_units()``` function, and specify the polygon whose area we want to measure, and our desired units. Here, we'll assign that value to ```boulder_area_km```:
+
 ```{r}
 boulder_area_km<-set_units(boulder_area, "km^2")
 ```
+
+To print the area in kilometers^2, simply print the area of the object name:
+
+```{r}
+boulder_area_km
+```
+
+Let's now take a more involved example. Let's say we want to find the areas of all the census tracts that intersect with Boulder County. 
+
+First, let's extract a tract level dataset for Colorado using *tidycensus*, and assign it to an object named ```CO_tracts```:
 
 ```{r}
 CO_tracts<-get_decennial(geography = "tract",
@@ -1034,16 +1076,21 @@ CO_tracts<-get_decennial(geography = "tract",
                       st_transform(2231)
 ```
 
+Let's take a look at our census tracts:
+
 ```{r}
 tm_shape(CO_tracts)+
   tm_polygons()
 ```
+
+Now, let's extract all of the census tracts that intersect with Boulder County, and assign this selection to an object named ```boulder_tracts```:
 
 ```{r}
 boulder_tracts<-CO_tracts %>% 
                   st_filter(boulder_county_projected, .predicate=st_intersects)
 ```
 
+Let's view these tracts against the backdrop of Boulder County: 
 
 ```{r}
 tm_shape(boulder_tracts)+
@@ -1052,10 +1099,7 @@ tm_shape(boulder_county_projected)+
   tm_polygons("red", alpha=0.5)
 ```
 
-
-```{r}
-boulder_tracts
-```
+Now, take a look at the attribute table using ```View(boulder_tracts)```. Let's say we want to create a new column, named "area", containing information on the area of each of the tracts in the dataset. We can do so with the following (note that ```options(scipen = 100)``` turns off scientific notation). 
 
 ```{r}
 # Turn off scientific notation
@@ -1066,9 +1110,12 @@ boulder_tract_areas<-boulder_tracts %>%
 
 ```
 
+Let's say we want to change our units to kilometers^2; we can do so with the following:
 ```{r}
 units(boulder_tract_areas$area)<-"km^2"
 ```
+
+Open the attribute table to confirm that the changes have been made (```View(boulder_tract_areas)```). 
 
 ```{r}
 boulder_tract_areas
@@ -1077,15 +1124,19 @@ boulder_tract_areas
 
 # Distance Buffers
 
-https://geodacenter.github.io/opioid-environment-toolkit/buffer_analysis.html
+Let's now return to our hospitals and fire stations:
 
 ```{r}
 firestations_hospitals
 ```
 
+Let's say we want to create a buffer, with a radius of one mile, for each of the hospitals; we can do so by passing ```boulder_hospitals``` to the ```st_buffer()``` function, and specifying the distance using the "dist" argument (since the dataset's units are in feet, we express the one mile radius in feet). We'll assign these buffers to a new object named ```hospital_buffers```:
+
 ```{r}
 hospital_buffers<-st_buffer(boulder_hospitals, dist=5280)
 ```
+
+Now, let's plot these buffers, along with the underlying points. The function used to plot buffers is ```tm_borders()```:
 
 ```{r}
 tm_shape(boulder_county_projected)+
@@ -1096,9 +1147,13 @@ tm_shape(hospital_buffers)+
   tm_borders(alpha=0.5, "blue", lwd=3)
 ```
 
+Now, let's create one mile buffers for our fire stations and assign it to an object named ```fire_station_buffers```:
+
 ```{r}
 fire_station_buffers<-st_buffer(boulder_fire_stations_projected, dist=5280)
 ```
+
+Let's now plot our first station buffers, along with the underlying points:
 
 ```{r}
 tm_shape(boulder_county_projected)+
@@ -1108,6 +1163,7 @@ tm_shape(boulder_fire_stations_projected)+
 tm_shape(fire_station_buffers)+
   tm_borders(alpha=0.5, "red", lwd=3)
 ```
+We can plot both sets of buffers with the following:
 
 ```{r}
 tm_shape(boulder_county_projected)+
@@ -1121,10 +1177,13 @@ tm_shape(boulder_hospitals)+
 tm_shape(hospital_buffers)+
   tm_borders(alpha=0.5, "blue", lwd=3)
 ```
+Now that we have our buffers, we can do some interesting visualization and analysis. For example, let's say we want to visually represent the geographic areas in Boulder county that are within one mile of a hospital AND within one mile of a fire station. To do so, let's compute the intersection between our buffers and assign it to an object named ```hospital_firestation_intersection```:
 
 ```{r}
 hospital_firestation_intersection<-st_intersection(hospital_buffers, fire_station_buffers)
 ```
+
+Let's plot this object: 
 
 ```{r}
 tm_shape(boulder_county_projected)+
@@ -1133,12 +1192,15 @@ tm_shape(hospital_firestation_intersection)+
   tm_polygons("orange")
 ```
 
+Then, let's dissolve the borders so we have a cleaner image, and assign it to an object named ```boulder_county_projected```:
 
 ```{r}
 hospital_firestation_intersection_dissolve<-hospital_firestation_intersection %>% 
                                             group_by() %>% 
                                             summarise()
 ```
+
+Let's view this area: 
 
 ```{r}
 tm_shape(boulder_county_projected)+
@@ -1147,13 +1209,19 @@ tm_shape(hospital_firestation_intersection_dissolve)+
   tm_polygons("orange")
 ```
 
+We can also find the area of this intersection:
+
 ```{r}
 fire_hospital_intersection_area<-st_area(hospital_firestation_intersection_dissolve)
 ```
 
+Let's print this area:
+
 ```{r}
 fire_hospital_intersection_area
 ```
+
+Let's say we want to express the area in square miles. To do so, let's pass ```fire_hospital_intersection_area``` to the ```set_units()``` function:
 
 ```{r}
 fire_hospital_intersection_area_sqmiles<-set_units(fire_hospital_intersection_area, "miles^2")
@@ -1161,99 +1229,8 @@ fire_hospital_intersection_area_sqmiles<-set_units(fire_hospital_intersection_ar
 fire_hospital_intersection_area_sqmiles
 ```
 
-15.83 sq miles within Boulder County is within 1 mile of both a fire station AND a hospital
+We can see that 15.83 sq miles within Boulder County is within 1 mile of both a fire station AND a hospital
 
-```{r}
-hospital_firestation_union<-st_union(hospital_buffers, fire_station_buffers)
-```
-
-```{r}
-tm_shape(boulder_county_projected)+
-  tm_polygons()+
-tm_shape(hospital_firestation_union)+
-  tm_polygons("gold")
-```
-
-```{r}
-hospital_firestation_union_dissolve<-hospital_firestation_union %>% 
-                                            group_by() %>% 
-                                            summarise()
-```
+As an exercise, see if you can figure out the area within Boulder County that is within 1 mile of a fire station OR a hospital. 
 
 
-```{r}
-tm_shape(boulder_county_projected)+
-  tm_polygons()+
-tm_shape(hospital_firestation_union_dissolve)+
-  tm_polygons("gold")
-```
-
-
-```{r}
-hospital_firestation_union_area<-st_area(hospital_firestation_union_dissolve)
-
-hospital_firestation_union_area
-```
-
-```{r}
-hospital_firestation_union_area_sqmiles<-set_units(hospital_firestation_union_area, "miles^2")
-
-hospital_firestation_union_area_sqmiles
-```
-
-257 miles are within 1 mile of a fire station OR hospital
-
-
-
-continental_usa_dissolve<-continental_USA_regions_projected %>% 
-                              group_by(region) %>% 
-                              summarise()
-
-https://geobgu.xyz/r/geometric-operations-with-vector-layers.html#distance
-
-
-https://towardsdatascience.com/breaking-down-geocoding-in-r-a-complete-guide-1d0f8acd0d4b
-https://cran.r-project.org/web/packages/tidygeocoder/vignettes/tidygeocoder.html
-
-
-https://www.epa.gov/frs/epa-frs-facilities-state-single-file-csv-download
-https://www.epa.gov/frs/geospatial-data-download-service
-
-
-geocoding
-buffer
-spatial join
-intersect/union/overlap
-distance calculations
-area calculations
-coordinate systems 
-
-https://www.epa.gov/frs/epa-frs-facilities-state-single-file-csv-download
-
-latlong: https://www.britannica.com/science/latitude
-
-https://philmikejones.me/tutorials/2015-09-03-dissolve-polygons-in-r.html
-
-https://geobgu.xyz/r/geometric-operations-with-vector-layers.html
-
-https://github.com/r-spatial/sf/issues/290 
-
-https://mgimond.github.io/Spatial/vector-operations-in-r.html
-
-http://learnline.cdu.edu.au/units/ses101/env208/w5_files/GeoprocessingTools_handouts.pdf
-
-https://www.r-bloggers.com/2014/07/clipping-spatial-data-in-r/
-
-
-
-superfund dataset: https://dataverse.unc.edu/dataset.xhtml?persistentId=doi:10.15139/S3/4QEIGO
-
-https://glenbambrick.com/tag/map-projections/
-
-https://walker-data.com/census-r/spatial-analysis-with-us-census-data.html
-
-https://stackoverflow.com/questions/62442150/why-use-st-intersection-rather-than-st-intersects
-
-http://www.wvview.org/spatial_analytics/Visualizing_Spatial_Data/_site/Visualize_Spatial_Data.html
-
-https://datacornering.com/remove-scientific-notation-in-r/
