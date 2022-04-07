@@ -688,6 +688,7 @@ tm_shape(states_bounding_box_intersection)+
 If, instead of using ```arbitrary_bounding_box``` as a cookie cutter, we want to extract the full extent of all of the state polygons that intersect with the bounding box (so that the full extent of states that are partially within the bounding box is returned), we can instead use the ```st_filter()``` function with the ```st_intersects()``` predicate. Below, we first take ```continental_USA_regions```, and then use ```st_filter(arbitrary_bounding_box, .predicate=st_intersects)``` to extract all of the polygons within that dataset which intersect with the bounding box; we'll assign these polygons to a new object named ```states_bounding_box_intersect```:
 
 ```{r}
+# Extracts full extent of all polygons that intersect with "arbitrary_bounding_box" and assigns to object named "states_bounding_box_intersect"
 states_bounding_box_intersect<-
   continental_USA_regions %>% 
           st_filter(arbitrary_bounding_box, .predicate=st_intersects)
@@ -696,6 +697,7 @@ states_bounding_box_intersect<-
 Now, let's plot ```states_bounding_box_intersect```: 
 
 ```{r}
+# Plots "states_bounding_box_intersect"
 tm_shape(states_bounding_box_intersect)+
   tm_polygons()
 ```
@@ -706,6 +708,7 @@ Note the difference from the earlier plot; instead of using the bounding box as 
 The intersection between two vector datasets is the geographic area that is common to both (i.e. areas that are in BOTH datasets, at the point of overlap). The union between two vector datasets is the area in *either* dataset (i.e. the point of overlap AND areas that are unique to each). To see this visually, let's first create another arbitrary bounding box, named ```arbitrary_bounding_box_two```:
 
 ```{r}
+# Creates a second arbitrary bounding box
 arbitrary_bounding_box_two<-
     st_bbox(c(xmin=75000, xmax=930000, ymin=1300000, ymax=2100000)) %>% 
     st_as_sfc() %>% 
@@ -715,6 +718,7 @@ arbitrary_bounding_box_two<-
 Now, let's plot both bounding boxes against ```continental_USA_regions```:
 
 ```{r}
+# Plots both bounding boxes over map of USA states
 tm_shape(continental_USA_regions)+
   tm_polygons()+
 tm_shape(arbitrary_bounding_box)+
@@ -725,12 +729,14 @@ tm_shape(arbitrary_bounding_box_two)+
 Let's now compute the geometric union between these bounding boxes using the ```st_union()``` function, and assign it to a new object named ```bounding_box_union```:
 
 ```{r}
+# Computes union of bounding boxes and assigns to "bounding_box_union"
 bounding_box_union<-st_union(arbitrary_bounding_box, arbitrary_bounding_box_two)
 ```
 
 Now, let's plot ```bounding_box_union``` against the backdrop of the states:
 
 ```{r}
+# Plots union of the two bounding boxes
 tm_shape(continental_USA_regions)+
   tm_polygons()+
 tm_shape(bounding_box_union)+
@@ -739,12 +745,14 @@ tm_shape(bounding_box_union)+
 Let's now contrast the area defined by the union with the area that is defined by the intersection. First, we'll compute the intersection of our two bounding boxes, and assign it to an object named ```bounding_box_intersection```: 
 
 ```{r}
+# Calculates the intersection of the bounding boxes and assigns the result to "bounding_box_intersection"
 bounding_box_intersection<-st_intersection(arbitrary_bounding_box, arbitrary_bounding_box_two)
 ```
 
 Now, let's view the intersection (i.e. the area of overlap between the two boxes): 
 
 ```{r}
+# Plots the intersection of the bounding boxes over state map
 tm_shape(continental_USA_regions)+
   tm_polygons()+
 tm_shape(bounding_box_intersection)+
@@ -753,9 +761,13 @@ tm_shape(bounding_box_intersection)+
 
 ## Inverse clip/Erase
 
+We can perform the inverse of a clip/intersection operation, i.e. find the geographic area in which features do *not* overlap; we can do so using the ```st_difference()``` function. Below, we use ```st_difference``` to extract the area in ```continental_USA_regions``` that does NOT intersect with ```arbitrary_bounding_box```; we'll assign the result to a new object named ```states_bounding_box_inverse```:
+
 ```{r}
 states_bounding_box_inverse<-st_difference(continental_USA_regions, arbitrary_bounding_box)
 ```
+
+When we plot ```states_bounding_box_inverse```, you'll see that only the parts of ```continental_USA_regions``` that do not intersect with ```arbitrary_bounding_box``` are displayed":
 
 ```{r}
 tm_shape(states_bounding_box_inverse)+
