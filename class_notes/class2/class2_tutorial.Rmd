@@ -85,18 +85,21 @@ class(worldbank_project_locations)
 In order to turn this regular, tabular dataset into a spatial data object that we can work with in a GIS framework, we must pass ```worldbank_project_locations``` to the ```st_as_sf()``` function; within the function, we must also specify the names of the fields containing the longitude and latitude coordinates (```coords=c("longitude", "latitude")```), and the underlying coordinate reference system used to measure these lat/long values. In this case, that coordinate reference system is WGS84, and we can specify this using its EPSG code, which is 4326, by setting ```crs=4326```. The ```st_as_sf()``` function will use this information (i.e. the names of the fields containing the longitude and latitude coordinates, and the coordinate reference system), and transform ```worldbank_project_locations``` into a spatial dataset of point locations; we'll assign this spatial dataset to a new object named ```worldbank_locations_spatial```: 
 
 ```{r}
+# Creates a spatial object using "worldbank_project_locations" and assigns the result to a new object named "worldbank_locations_spatial"
 worldbank_locations_spatial<-st_as_sf(worldbank_project_locations, coords=c("longitude", "latitude"), crs=4326)
 ```
 
 We can confirm that ```worldbank_locations_spatial``` is indeed a spatial object with the following:
 
 ```{r}
+# Prints data class of "worldbank_locations_spatial"
 class(worldbank_locations_spatial)
 ```
 
 Now that we've created a new vector dataset comprised of points (representing WB project locations), let's go ahead and visualize these locations using *tmap*. The code below should be familiar, but note that instead of using the ```tm_polygons()``` function to render the dataset's spatial information, we use ```tm_dots()```, which is the *tmap* function that can be used to render point data. Note that if we had a vector dataset comprised of line (rather than polygon or point) data, we could render those lines with ```tm_lines()```. 
 
 ```{r, fig.asp=0.5}
+# Plots locations of WB projects in "worldbank_locations_spatial"
 tm_shape(worldbank_locations_spatial)+
   tm_dots()
 ```
@@ -106,6 +109,7 @@ We can now see the distribution of projects, scattered across the developing wor
 Before plotting the two datasets together, however, it's important to always make sure that they're in the same coordinate reference system; if they are in different coordinate reference system, the resulting visual display (and any subsequent calculations we perform using these datasets) will be inaccurate, since they use different frames of reference. Here, we are in good shape, since we already explicitly defined the CRS for ```worldbank_locations_spatial```. And, with respect to  ```country_boundaries```, note the metadata when we print the object:
 
 ```{r, eval=F}
+# Prints metadata associated with "country_boundaries"
 country_boundaries
 ```
 
@@ -144,6 +148,7 @@ tm_shape(worldbank_locations_spatial)+
 And, to plot them in relation to each other, we can simply use the following: 
 
 ```{r, fig.asp=0.5}
+# Overlays world bank projects over country polygons using tmap syntax
 tm_shape(country_boundaries)+
   tm_polygons()+
 tm_shape(worldbank_locations_spatial)+
@@ -162,9 +167,11 @@ tm_shape(country_boundaries)+
 As we noted in our last class, we can always assign the code used to visually render spatial datasets using *tmap* to objects. For example:
 
 ```{r}
+# Assigns plot of country boundaries to object named "country_polygons"
 country_polygons<-tm_shape(country_boundaries)+
                     tm_polygons()
 
+# Assigns plot of project locations to object named "WB_aid_locations"
 WB_aid_locations<-tm_shape(worldbank_locations_spatial)+
                     tm_dots()
 ```
@@ -172,6 +179,7 @@ WB_aid_locations<-tm_shape(worldbank_locations_spatial)+
 Now, we can recreate our earlier plot with the following:
 
 ```{r, fig.asp=0.5}
+# Overlays "WB_aid_locations" against "country_polygons"
 country_polygons+
 WB_aid_locations
 ```
@@ -179,6 +187,7 @@ WB_aid_locations
 Of course, ```country_polygons+WB_aid_location``` itself could be assigned to its own object, which will store the map for future use. For example:
 
 ```{r}
+# Assigns plot of project sites against country polygons to object named "aid_map"
 aid_map<-country_polygons+
             WB_aid_locations
 ```
@@ -186,6 +195,7 @@ aid_map<-country_polygons+
 Now, we can bring up our layers whenever we want by printing the object name:
 
 ```{r, fig.asp=0.5}
+# prints "aid_map" plot
 aid_map
 ```
 
@@ -193,12 +203,15 @@ We can customize our layers in any number of ways using the sorts of *tmap* func
 
 ```{r, echo=-1, fig.asp=0.5}
 tmap_mode("plot")
+
+# customizes polygon and point colors, and assigns result to object named "worldmap_projects"
 worldmap_projects<-
   tm_shape(country_boundaries)+
     tm_polygons("red2")+
   tm_shape(worldbank_locations_spatial)+
     tm_dots("lightblue1")
 
+# prints "worldmap_projects"
 worldmap_projects
 ```
 
@@ -212,12 +225,14 @@ Once the data has been downloaded, you can read it into R Studio by passing the 
 
 ```{r, echo=-1}
 setwd("class_notes/class2/data/data_malawi")
+# reads in Malawi constituency boundary vector dataset
 Malawi_constituencies<-st_read("MAA.shp")
 ```
 
 Go ahead and view this spatial dataset's attribute table, using the ```View()``` function:
 
 ```{r}
+# opens attribute table of "Malawi_constituencies"
 View(Malawi_constituencies)
 ```
 
@@ -235,6 +250,7 @@ Malawi_constituencies %>% datatable(extensions=c("Scroller", "FixedColumns"), op
 Now, let's render the polygon geometries of the Malawi constituency boundaries dataset using *tmap*:  
 
 ```{r}
+# Plots "Malawi_constituencies"
 tm_shape(Malawi_constituencies)+
   tm_polygons()
 ```
@@ -242,6 +258,7 @@ tm_shape(Malawi_constituencies)+
 Let's now turn back to ```worldbank_locations_spatial``` and, extract the Malawi observations from that global dataset. Moreoever, let's say we're only interested in projects with over $25,000,000 committed. The code below takes the global dataset of World Bank development aid projects (```worldbank_locations_spatial```), and uses the ```filter()``` function to extract the observations where the "recipients" field is equal to "Malawi", and the "total_commitments" field is greater than 25000000; it then assigns the dataset extracted from this subsetting operation to a new object named ```malawi_foreignaid_sites```. 
 
 ```{r}
+# Extracts Malawi projects with commitments over $25000000 and assigns it to a new spatial object named "malawi_foreignaid_sites" 
 malawi_foreignaid_sites<-worldbank_locations_spatial %>% 
                               filter(recipients=="Malawi" & total_commitments>25000000)
 ```
@@ -249,6 +266,7 @@ malawi_foreignaid_sites<-worldbank_locations_spatial %>%
 Let's now overlay ```Malawi_foreignaid_sites``` against the polygon layer of ```Malawi_constituencies```:
 
 ```{r}
+# Overlays Malawi projects over 25 mil against Malawi constituencies
 tm_shape(Malawi_constituencies)+
   tm_polygons("red2")+
 tm_shape(malawi_foreignaid_sites)+
@@ -273,6 +291,7 @@ tmap_mode("plot")
 When plotting point data, it is often the case that many observations are in exactly the same location; because these points overlap perfectly (and hence show up as only a single point), it can be difficult to identify large point clusters. One quick way to address this issue is to "jitter", or add a small degree or arbitrary noise to our points before displaying them; this will help salient observational clusters stand out:
 
 ```{r}
+# Jitters project locations
 tm_shape(Malawi_constituencies)+
   tm_polygons("red2")+
 tm_shape(malawi_foreignaid_sites)+
@@ -286,18 +305,21 @@ To implement a spatial join, it is extremely important that the two datasets sha
 First, we'll project ```Malawi_constituencies``` into EPSG:20936 and assign the reprojected spatial dataset to a new object named ```Malawi_constituencies_projected```:
 
 ```{r}
+# Reprojects "Malawi_constituencies" to EPSG: 20936 and assigns reprojected data to "Malawi_constituencies_projected"
 Malawi_constituencies_projected<-st_transform(Malawi_constituencies, 20936)
 ```
 
 We'll do the same for ```malawi_foreignaid_sites```, and assign the reprojected version of this dataset to a new object named ```malawi_foreignaid_sites_projected```: 
 
 ```{r}
+# Reprojects "malawi_foreignaid_sites" to EPSG: 20936 and assigns reprojected data to "malawi_foreignaid_sites_projected"
 malawi_foreignaid_sites_projected<-st_transform(malawi_foreignaid_sites, 20936)
 ```
 
 Now, we're ready to spatially join our datasets, which we can do using the ```st_join()``` function in *sf*. Below, we'll use ```malawi_foreignaid_sites_projected``` as our "main" dataset, and join ```Malawi_constituencies_projected``` to it based on the spatial information embedded in the datasets. We'll assign the product of the join to a new object named ```malawi_projects_constituencies_spatialjoin```: 
 
 ```{r}
+# Joins "Malawi_constituencies_projected" to "malawi_foreignaid_sites_projected" based on spatial location and assigns the result to object named "malawi_projects_constituencies_spatialjoin"
 malawi_projects_constituencies_spatialjoin<-st_join(malawi_foreignaid_sites_projected, Malawi_constituencies_projected )
 ```
 
@@ -323,6 +345,7 @@ If you scroll across the table, you'll notice that for every project, we now hav
 If we reverse the order of the join, using ```Malawi_constituencies_projected``` as the "main" dataset to which we join ```malawi_foreignaid_sites_projected```, the product of the join will look slightly different. Instead of a project-level dataset with constituency information attached to each project, we will instead have a constituency-level dataset with information about each project associated with a constituency (if a constituency is associated with more than one project, there will be more than one row for that constituency). To make this more concrete, let's reverse the join, and see what the product looks like. Below, we call the same ```st_join()``` function, but reverse the order of the arguments, such that ```Malawi_constituencies_projected``` is first, and ```malawi_foreignaid_sites_projected``` is second. We'll assign the product of this join to a new object named ```malawi_constituencies_projects_spatialjoin```: 
 
 ```{r}
+# Spatially joins "malawi_foreignaid_sites_projected" to "Malawi_constituencies_projected" and assigns the joined dataset to "malawi_constituencies_projects_spatialjoin"
 malawi_constituencies_projects_spatialjoin<-st_join(Malawi_constituencies_projected, malawi_foreignaid_sites_projected )
 ```
 
@@ -350,6 +373,7 @@ Recall that our goal was to extract information about the number of World Bank p
 We can leverage some basic *dplyr* functions to extract the information we need; below, we'll take ```malawi_projects_constituencies_spatialjoin```, and then specify ```group_by(ID)``` to indicate that we want to calculate group-level information with respect to the "ID" variable, which uniquely identifies constituencies. Then, ```summarize(n())``` counts up the total number of records within each ID group of ```malawi_projects_constituencies_spatialjoin```; in effect, this is the total number of projects within each constituency. Let's assign this data to a new object named ```project_sites_per_constituency```:
 
 ```{r}
+# Calculates the number of project sites in each constituency and assigns the summary dataset to an object named "project_sites_per_constituency"
 project_sites_per_constituency<-malawi_projects_constituencies_spatialjoin %>% 
                            group_by(ID) %>% 
                            summarize(n())
@@ -372,13 +396,10 @@ project_sites_per_constituency %>% datatable(extensions=c("Scroller", "FixedColu
 ))
 ```
 
-```{r}
-View(project_sites_per_constituency)
-```
-
 Let's go ahead and rename the "n()" column, which contains information on the total number of project sites in each constituency (uniquely identified by the ID variable), to something more descriptive:
 
 ```{r}
+# Renames the "n()" column in "project_sites_per_constituency" to "sum_projects"
 project_sites_per_constituency<-project_sites_per_constituency %>% 
                                 rename(sum_projects="n()")
 ```
@@ -386,12 +407,14 @@ project_sites_per_constituency<-project_sites_per_constituency %>%
 Let's join this data back into our projected constituency-level spatial dataset, ```Malawi_constituencies_projected```, based on the ID variable. To do so, we first have to convert ```project_sites_per_constituency``` into a data frame object, since the *sf* package does not support joining two spatial objects together based on a common tabular field. We'll assign the data frame object to a new object named ```project_sites_per_constituency_df```. 
 
 ```{r}
+# creates data frame object (project_sites_per_constituency_df) based on "project_sites_per_constituency"
 project_sites_per_constituency_df<-as.data.frame(project_sites_per_constituency)
 ```
 
 Now, let's implement the table join (using "ID" as the join field), and assign the product to a new object named ```malawi_constituencies_projects_spatial```: 
 
 ```{r}
+# Joins "project_sites_per_constituency_df" to "Malawi_constituencies_projected" by ID
 malawi_constituencies_projects_spatial<-full_join(Malawi_constituencies_projected, project_sites_per_constituency_df, by="ID")
 ```
 
@@ -410,11 +433,12 @@ malawi_constituencies_projects_spatial %>% datatable(extensions=c("Scroller", "F
 ))
 ```
 
-If you scroll across, you'll notice we now have a field, named "sum_projects", with information on the number of project sites in each constituency. 
+If you scroll across the dataset, you'll notice we now have a field, named "sum_projects", with information on the number of project sites in each constituency. 
 
 You may notice that many of the observations have "NA" values, indicating that there were no projects in these constituencies. It may be useful to replace these "NAs" with "0", since that would be a more accurate representation in this case. To do so, we can use the `replace_na``` function. Below, we'll also relocate the "total_unique_projects" to the front of the dataset
 
 ```{r}
+# Takes "malawi_constituencies_projects_spatial", replaces "na" values for "sum_projects" column to zero, and relocates ID and "sum_projects" to the front of the dataset
 malawi_constituencies_projects_spatial<-malawi_constituencies_projects_spatial %>% 
                                         replace_na(list(sum_projects=0)) %>% 
                                         relocate(ID, sum_projects)
@@ -437,7 +461,7 @@ malawi_constituencies_projects_spatial %>% datatable(extensions=c("Scroller", "F
 ))
 ```
 
-We have a constituency-level dataset containing information on the number of WB foreign aid project sites within each constituency, which was acquired via the spatial join. This information could be used, for example, in a constituency-level analysis of the political or economic implications of WB project sites. 
+We now have a constituency-level dataset containing information on the number of WB foreign aid project sites within each constituency, which was acquired via the spatial join. This information could be used, for example, in a constituency-level analysis of the political or economic implications of WB project sites. 
 
 # Manipulating Vector Data
 
