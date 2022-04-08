@@ -764,12 +764,14 @@ tm_shape(bounding_box_intersection)+
 We can perform the inverse of a clip/intersection operation, i.e. find the geographic area in which features do *not* overlap; we can do so using the ```st_difference()``` function. Below, we use ```st_difference``` to extract the area in ```continental_USA_regions``` that does NOT intersect with ```arbitrary_bounding_box```; we'll assign the result to a new object named ```states_bounding_box_inverse```:
 
 ```{r}
+# Extracts areas where "arbitrary_bounding_box" does NOT intersect with "continental_USA_regions"
 states_bounding_box_inverse<-st_difference(continental_USA_regions, arbitrary_bounding_box)
 ```
 
 When we plot ```states_bounding_box_inverse```, you'll see that only the parts of ```continental_USA_regions``` that do not intersect with ```arbitrary_bounding_box``` are displayed":
 
 ```{r}
+# Plots "states_bounding_box_inverse"
 tm_shape(states_bounding_box_inverse)+
   tm_polygons()
 ```
@@ -785,18 +787,21 @@ The dataset we'll work with is an EPA dataset for the state of Colorado. It cont
 You can also read in the dataset directly into R using the link below; we'll assign the dataset to an object named ```CO_epa```: 
 
 ```{r}
+# Reads in EPA dataset from cloud storage and assigns to "CO_epa"
 CO_epa<-read_csv("https://www.dropbox.com/s/43pcrmvhs0dqcwv/STATE_SINGLE_CO.CSV?dl=1")
 ```
 
 After opening up the dataset and viewing its contents, let's filter our dataset, and confine our attention to Boulder County. We'll assign the subsetted data to a new object named ```CO_epa_boulder```:
 
 ```{r}
+# Extracts Boulder observations from "CO_epa" and assigns to new object named "CO_epa_boulder"
 CO_epa_boulder<-CO_epa %>% filter(COUNTY_NAME=="BOULDER")
 ```
 
 Now, let's use the address information in the dataset to attach lat/long coordinates to the Boulder EPA sites. We can do so using the ```geocode()``` function from *tidygeocoder*. The code below takes ```CO_epa_boulder```, and then applies the ```geocode()``` function. The parameters link the various address fields in the dataset to address components (such as "street", "city" etc). The other important argument is "method", where we specify that we want to geocode the dataset using the Census geocoder, which you can learn more about [here](https://www2.census.gov/geo/pdfs/maps-data/data/FAQ_for_Census_Bureau_Public_Geocoder.pdf). Setting ```full_results=TRUE``` will return information about the accuracy of the geocodes. We'll assign the new dataset with the geocodes to an object named ```CO_epa_boulder_geocoded_census```:
 
 ```{r, eval=F}
+# Geocodes "CO_epa_boulder" sites and assigns to object named "CO_epa_boulder_geocoded_census"
 CO_epa_boulder_geocoded_census<-CO_epa_boulder %>% 
                             geocode(street=LOCATION_ADDRESS, city=CITY_NAME, postalcode = POSTAL_CODE, state=STATE_NAME, limit=1, method="census", full_results=TRUE)
 ```
@@ -808,6 +813,7 @@ CO_epa_boulder_geocoded_census<-read_csv("class_notes/class2/data/geocoded_datas
 If you open the dataset, you'll note that we now have lat/long information that can be used to create a spatial object. It's not possible to create a spatial object using a data frame with NA values in the lat/long fields, so we'll drop these rows using ```drop_na(long)```. The code that reads ```  st_as_sf(coords=c("long", "lat"), crs=4269)``` creates the spatial object using the lat/long information; note the ```crs=4269```; usually, the lat/long coordinates returned by geocoders are in WGS84 (i.e. EPSG=4326), but the Census geocoder returns coordinates using NAD83, which corresponds to the CRS with epsg=4269. 
 
 ```{r}
+# Creates spatial obejct from "CO_epa_boulder_geocoded_census"
 CO_epa_boulder_points<-CO_epa_boulder_geocoded_census %>% 
                         drop_na(long) %>% 
                         st_as_sf(coords=c("long", "lat"), crs=4269)
@@ -816,6 +822,7 @@ CO_epa_boulder_points<-CO_epa_boulder_geocoded_census %>%
 Let's now extract a map of Colorado counties in the same CRS, and assign it to an object named ```CO_counties```:
 
 ```{r, message=F, warning=F, results=F}
+# Extracts county level dataset for CO, with EPSG=4269
 CO_counties<-get_decennial(geography = "county",
                            state="CO",
                            variables = "P001001",
@@ -825,7 +832,6 @@ CO_counties<-get_decennial(geography = "county",
 ```
 
 And now, let's map the locations of the Boulder EPA sites against a plot of CO counties:
-
 
 ```{r}
 tm_shape(CO_counties)+
@@ -837,6 +843,7 @@ tm_shape(CO_epa_boulder_points)+
 Instead of mapping the points with respect to all of the counties in Colorado, let's map our points with respect to Boulder in particular. First, let's extract Boulder County from ```CO_counties``` and assign it to an object named ```boulder_county```:
 
 ```{r}
+# Extracts Boulder polygon from "CO_counties"
 boulder_county<-CO_counties %>% 
                   filter(GEOID=="08013")
 ```
@@ -849,11 +856,13 @@ tm_shape(boulder_county)+
 tm_shape(CO_epa_boulder_points)+
   tm_dots("orange")
 ```
+
 You'll notice that some of the locations fall out of the area delimited by the Boulder county polygon; this could be due to error of various kinds. Instead of diagnosing it, let's just say you want to clip out the points outside of Boulder. 
 
 First, let's project both of our datasets into a projection that is more suited to Boulder County, since we'll eventually perform some spatial calculations on this data, and it is important to be in a projected coordinate system for these purposes. The projection we'll use is associated with the EPSG code 2221; see more information [here](https://epsg.io/2231). We'll assign both reprojected datasets to new objects, as below:
 
 ```{r}
+# reprojects datasets to CRS best-suited to Boulder 
 boulder_county_projected<-st_transform(boulder_county, 2231)
 CO_epa_boulder_points_projected<-st_transform(CO_epa_boulder_points, 2231)
 ```
@@ -861,6 +870,7 @@ CO_epa_boulder_points_projected<-st_transform(CO_epa_boulder_points, 2231)
 Now, let's filter out the observations that intersect the Boulder polygon. We'll take ```CO_epa_boulder_points_projected```, and then use ```st_filter(boulder_county_projected, .predicate=st_intersects)``` to extract the points that intersect the Boulder polygon; this will remove the observations that fall outside Boulder. We'll assign this spatially filtered data to a new object named ```CO_epa_boulder_points_cleaned```: 
 
 ```{r}
+# Removes observations falling outside Boulder using spatial filtering; assigns cleaned dataset to object named "CO_epa_boulder_points_cleaned"
 CO_epa_boulder_points_cleaned<-
   CO_epa_boulder_points_projected %>% 
     st_filter(boulder_county_projected, .predicate=st_intersects)
@@ -1286,4 +1296,7 @@ We can see that 15.83 sq miles within Boulder County is within 1 mile of both a 
 
 As an exercise, see if you can figure out the area within Boulder County that is within 1 mile of a fire station OR a hospital. 
 
+```{r}
+
+```
 
