@@ -63,13 +63,15 @@ A link to the class notes will be available here soon after the class session.
 
 ## Assignment
 
+Please choose **one** of the options below and turn it in before the start of Class 3. 
+
 *Option 1*
 
-Explore some of the vector datasets discussed in the [General Resources](/resources.md) section of the page. Find a polygon dataset, and a point dataset (or a tabular dataset that is geocoded), and implement a spatial join to derive a new dataset that contains information on the number of points within each polygon. What research questions might the dataset you generated help to answer? 
+Explore some of the vector datasets discussed in the [General Resources](/resources.md) section of the course webpage. Find a polygon dataset, and a point dataset (or a tabular dataset that is geocoded), and implement a spatial join to derive a new dataset that contains information on the number of points within each polygon. What research questions might the dataset you generated help to answer? 
 
 *Option 2* 
 
-Go to this [archive](https://openpolicing.stanford.edu/data/) of police stop data, provided as part of the [Stanford Open Policing Project](https://openpolicing.stanford.edu/). Under the "CO" heading on this [page](https://openpolicing.stanford.edu/data/), download the Aurora data as a CSV file. Read this file (which contains lat/long coordinates for most of the stops in the dataset; assume that the coordinate reference system for these lat/long coordinates are EPSG: 4326) into R Studio, and generate a new dataset that contains information on the total number of stops which took place in each census tract. 
+Go to this [archive](https://openpolicing.stanford.edu/data/) of police stop data, provided as part of the [Stanford Open Policing Project](https://openpolicing.stanford.edu/). Under the "CO" heading on this [page](https://openpolicing.stanford.edu/data/), download the "Aurora"" data as a CSV file. Read this file (which contains lat/long coordinates for most of the stops in the dataset; assume that the coordinate reference system for these lat/long coordinates are EPSG: 4326) into R Studio, and generate a new dataset that contains information on the total number of police stops which took place in each census tract. 
 
 Document your steps/code, and send me the final dataset (i.e. the tract-level dataset on the number of stops) that you generated as a CSV file. 
 
