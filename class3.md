@@ -53,6 +53,34 @@ The tutorial for this class is available [here](class_notes/class3/raster_analys
 
 ## Useful resources
 
+* Documentation for the [exactextractr](https://cran.r-project.org/web/packages/exactextractr/readme/README.html) package, which implements zonal statistics.
+* Documentation for the [terra](https://cran.r-project.org/web/packages/terra/index.html) package, which is becoming the "go-to" package for handling raster data in R. 
+* A useful set of tutorials on the *terra* package, focusing on applied examples, is available [here](https://rspatial.org/terra/#google_vignette). 
+* The raster data used in the tutorial is from the [WorldPop](https://www.worldpop.org/) project, which contains a lot of interesting raster datasets. In addition, the [rspatialdata](https://rspatialdata.github.io/index.html) project offers accessible tutorials on various R packages that streamline the process of extracting raster datasets. It includes coverage of packages that facilitate the extraction of land cover, elevation, temperature, rainfall, humidity, vegetation, and air pollution rasters. Please see the [General Resources](resources.md) page for more raster data sources. 
+
 ## Assignment
+
+Choose **ONE** of the following options. Please make sure to document your steps (i.e. comment your code), and provide any relevant maps or datasets you create. 
+
+*Option 1*
+
+Take the dataset of World Bank projects we worked with last week, and implement a spatial join to compute the number of projects within different polygons of a vector dataset. Then, identify a raster dataset of interest, and use zonal statistics to compute raster summary statistics with respect to the polygons in your dataset. What questions might the dataset you've created (containing project information, and information computed from your raster) help you to answer? 
+
+*Option 2* 
+
+Find a raster dataset you're interested in and explore it. Use it to create a histogram of cell values, generate a map using the raster, and compute a zonal statistic of interest with respect to a vector dataset of interest. 
+
+*Option 3* 
+
+Did the percentage of NYC's population living within 750 metres of a subway stop increase or decrease between 2009 and 2019? (assume no subway stations were added during this time period) 
+
+*Option 4*
+
+Use a raster dataset to explore a question you are interested in. 
+
+
+
+
+
 
 
