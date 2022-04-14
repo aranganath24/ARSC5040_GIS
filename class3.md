@@ -47,9 +47,9 @@ doi: [https://doi.org/10.1177/0738894216659843](https://doi.org/10.1177/07388942
 
 * Dell, Melissa. 2010. "The Persistent Effects of Peru's Mining Mita". *Econometrica* 78(6): 1863-1903. 
 
-## Class notes
+## Class notes/tutorial
 
-A link to the class notes will be available here soon after the class session. 
+The tutorial for this class is available [here](class_notes/class3/raster_analysis.html). 
 
 ## Useful resources
 
