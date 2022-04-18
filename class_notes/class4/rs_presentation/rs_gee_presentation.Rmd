@@ -1,0 +1,62 @@
+---
+title: "Remote Sensing, Satellite Imagery, and Google Earth Engine"
+author: "Aditya Ranganath"
+date: "4/17/2022"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction and Roadmap
+
+* <font size="6">Overview of basic remote sensing concepts </font>
+* <font size="6">Working with satellite imagery products in R </font>
+* <font size="6">Google Earth Engine and geospatial "big data" </font>
+
+## Remote Sensing: Overview
+
+* <font size="4">Remote sensing techniques allow us to learn about what activities and processes taking place on the earth's surface by extracting information about the radiation given off by objects on the earth's surface </font>
+* <font size="4">A pixel in a satellite image contains information about the reflectance (at different parts of the electromagnetic spectrum) of surfaces or objects in the geographic area covered by that pixel; imagery datasets are therefore a type of raster. </font>
+* <font size="4">"Remote sensing" refers to the process of collecting, extracting, visualizing, and analyzing this pixel-level reflectance data </font>
+* <font size="4">Remote sensing techniques are used to create many of the off-the-shelf raster datasets that are widely used in applied work. For example, the population count rasters we worked with last class (clipped to NYC) are created by using remotely sensed data (that provides information on things such as land cover and night lights) that are fed into complex models that can make estimates about grid-cell population counts using these data (see [Stevens, Gaughan, Linard, and Tatem, 2015](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0107042)). </font>
+
+## Remote Sensing: Collecting Data
+1. Sunlight strikes the earth’s surface
+2. Some of it is absorbed, and some reflected back into space, where it is recorded by a sensor on a satellite (but could also be a drone, weather balloon etc.)
+
+```{r, echo=F, out.width='50%', out.height='50%'}
+knitr::include_graphics('/Users/adra7980/Documents/git_repositories/ARSC5040_GIS/class_notes/class4/rs_presentation/rs2.png')
+```
+
+## Remote Sensing: Collecting Data, continued
+
+3. Different objects or surfaces reflect sunlight in different amounts at different parts of the electromagnetic spectrum
+
+```{r}
+knitr::include_graphics('/Users/adra7980/Documents/git_repositories/ARSC5040_GIS/class_notes/class4/rs_presentation/rs1.png')
+```
+
+## Remote Sensing: Interpreting Data
+
+4. 
+
+## Remote Sensing: Social Science Applications
+
+As you might imagine, remote sensing is an essential tool for earth scientists and other natural scientists interested in biophysical processes. 
+
+* Extracting information about biophysical processes can inform us about social processes and institutions
+  * s
+* Interaction between biosphere and society
+* Research design
+* Provide information where official statistics are not reliable (i.e. North Korea)
+
+
+## GEE uses
+
+* Data archive; 
+* Dealing with very large datasets, or want to implement complex algorithms? 
+
+
+
