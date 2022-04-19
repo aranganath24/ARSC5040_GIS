@@ -27,11 +27,11 @@ library(exactextractr)
 library(terra)
 ```
 
-```{r, echo=F}
+```{r, echo=F, warning=F, message=F}
 library(DT) 
 ```
 
-```{r, echo=F}
+```{r, echo=F, warning=F, message=F}
 tmap_mode("plot")
 ```
 
