@@ -31,16 +31,32 @@ knitr::include_graphics('/Users/adra7980/Documents/git_repositories/ARSC5040_GIS
 ```
 
 ## Remote Sensing: Collecting Data, continued
+* <font size="3">Due to their different chemical compositions, different objects or surfaces reflect sunlight in different amounts at different parts of the electromagnetic spectrum. </font>
+* <font size="3">In other words, various objects have different "spectral signatures", and these different spectral signatures are recorded by the sensor positioned on the satellite. We can use these differing spectral signatures to make inferences about what sort of object is within a given pixel in an image. </font>
 
-3. Different objects or surfaces reflect sunlight in different amounts at different parts of the electromagnetic spectrum
-
-```{r}
+```{r, echo=F, out.width='50%', out.height='50%'}
 knitr::include_graphics('/Users/adra7980/Documents/git_repositories/ARSC5040_GIS/class_notes/class4/rs_presentation/rs1.png')
 ```
 
-## Remote Sensing: Interpreting Data
+## Remote Sensing: Visualizing spectral signatures
 
-4. 
+```{r, echo=F, out.width='50%', out.height='50%'}
+knitr::include_graphics('/Users/adra7980/Documents/git_repositories/ARSC5040_GIS/class_notes/class4/rs_presentation/rs3.png')
+```
+
+* <font size="3">This diagram is a visual representation of the differing spectral signatures of common objects found on the surface of the earth. </font>
+  * <font size="3">For example, at a wavelength of 800nm (within the near-infrared region of the electromagnetic spectrum), snow and ice have high reflectance signatures, while clear water has a very low reflectance signature. We can use these differing spectral signatures to make inferences about what sort of object is within a given pixel in a satellite image. </font>
+
+## Using spectral signatures to classify images: applied examples
+* Let's say you want to identify pixels in a satellite image with a high degree of live vegetation.
+* Different bands in a 
+
+```{r, echo=F, out.width='50%', out.height='50%'}
+knitr::include_graphics('/Users/adra7980/Documents/git_repositories/ARSC5040_GIS/class_notes/class4/rs_presentation/rs3.png')
+```
+
+## Example 1: The Normalized 
+
 
 ## Remote Sensing: Social Science Applications
 
@@ -60,3 +76,10 @@ As you might imagine, remote sensing is an essential tool for earth scientists a
 
 
 test
+
+* We can use these differing spectral signatures to make inferences about what sort of object is within a given pixel in a satellite image. In other words, we can exploit the the fact that different objects have different reflectance signatures at different parts of the electromagnetic spectrum to identify the sorts of activities or processes that are ocurring in the area delimited by a given pixel. 
+
+
+
+https://gisgeography.com/spectral-signature/
+
