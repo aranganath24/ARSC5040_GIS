@@ -53,14 +53,13 @@ doi: [https://doi.org/10.1177/0263775815608851](https://doi.org/10.1177/02637758
 * Gorelick, Noel, Matt Hancher, Mike Dixon, Simon Ilyushchenko, David Thau, and Rebecca Moore. 2017. “Google Earth Engine: Planetary-scale geospatial analysis for everyone.” *Remote Sensing of Environment* 202(1): 18-27.\
 [https://doi.org/10.1016/j.rse.2017.06.031](https://doi.org/10.1016/j.rse.2017.06.031) 
 
-## Class notes
+## Class notes and tutorial
 
-A link to the class notes will be available here soon after the class session. 
+The Class 4 tutorial is available [here](class_notes/class4/nvdi_landuse/nvdi_landuse.html). 
 
 ## Useful resources
 
 ## Assignment
 
-[test](class_notes/class4/rs_presentation/rs_gee_presentation.html)
-[test2](class_notes/class4/nvdi_landuse/nvdi_landuse.html)
+There is no assignment for next class; please make sure to prepare a brief presentation on your final project, to be delivered next class. 
 
