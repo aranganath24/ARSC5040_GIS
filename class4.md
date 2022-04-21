@@ -56,6 +56,7 @@ doi: [https://doi.org/10.1177/0263775815608851](https://doi.org/10.1177/02637758
 ## Class notes and tutorial
 
 The Class 4 tutorial is available [here](class_notes/class4/nvdi_landuse/nvdi_landuse.html). 
+Class 4 slides are available [here](class_notes/class4/rs_presentation/rs_gee_presentation.html), 
 
 ## Useful resources
 

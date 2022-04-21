@@ -12,8 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Introduction and Roadmap
 
 * <font size="6">Overview of basic remote sensing concepts </font>
-* <font size="6">Working with satellite imagery products in R </font>
 * <font size="6">Google Earth Engine and geospatial "big data" </font>
+* <font size="6">Tutorial: Working with satellite imagery products in R and GEE </font>
 
 ## Remote Sensing: Overview
 
@@ -78,49 +78,34 @@ If you were using a Landsat 7 image to derive the NDVI, this would mean
 * <font size="4">You'll also get some practice working with a land-use raster, which was also generated using satellite imagery, and use of differential spectral signatures to classify pixels with respect to various land uses. </font>
 * <font size="4">While it is possible to work with satellite imagery, and the raster datasets derived from them, in R you may encounter problems stemming from the extremely large size of these datasets</font>
 * <font size="4">If you need to process, visualize, calculate, or model with extremely large satellite and satallite-derived datasets, you may find yourself quickly running out of processing power on your local machine </font>
-  * <font size="3"> Putting "big data" in perspective: Until very recently, only about 4% of the total Landsat data archive had actually been analyzed, given the lack of computational resources </font>
 
 ## Satellite imagery and "big data", continued
 * <font size="4">In recent years, "big data" in the realm of remote sensing has rapidly transformed from obstacle to opportunity, with the emergence of high performancy computing and cloud data infrastructures that make it possible to process and analyze data at the petabyte scale. </font>
+  * <font size="3"> Putting "big data" in perspective: Until very recently, only about 4% of the total Landsat data archive had actually been analyzed, given the lack of computational resources </font>
 * <font size="4">If you find yourself needing these computational resources, one place to seek assistance is the [Research Computing](https://www.colorado.edu/rc/) department at CU </font>
 * <font size="4">However, another option is to use [Google Earth Engine](earthengine.google.com), a "planetary-scale platform for Earth science data and analysis" developed by Google </font>
 * <font size="4">Earth Engine is free for academic and non-profit use (though it requires registration), and effectively gives you the ability to tap into Google's supercomputing resources directly from your web browser. </font>
 
 ## The uses of Google Earth Engine 
 
-* Data archive; 
-* Dealing with very large datasets, or want to implement complex algorithms? 
-
-
-
-
+* Data archive
+* Useful when dealing with very large datasets, or you want to implement complex algorithms that require large amounts of computational power
+* Visualization capabilities are less well-developed
 
 ## Remote Sensing: Social Science Applications
 
-As you might imagine, remote sensing is an essential tool for earth scientists and other natural scientists interested in biophysical processes. 
+As you might imagine, remote sensing is an essential tool for earth scientists and other natural scientists interested in biophysical processes. While it hasn't traditionally been a commonly used method in social science, that is quickly changing: 
 
-* Extracting information about biophysical processes can inform us about social processes and institutions
-  * s
-* Interaction between biosphere and society
-* Research design
+* Substantive research questions about the interaction between biosphere and society
+* Research design (biophysical variables as possible exogenous sources of variation); see Donaldson and Storeygard (2016) for examples
 * Provide information where official statistics are not reliable (i.e. North Korea)
 
 
-## GEE uses
+## Tutorial
 
-* Data archive; 
-* Dealing with very large datasets, or want to implement complex algorithms? 
-
-
-test
-
-* We can use these differing spectral signatures to make inferences about what sort of object is within a given pixel in a satellite image. In other words, we can exploit the the fact that different objects have different reflectance signatures at different parts of the electromagnetic spectrum to identify the sorts of activities or processes that are ocurring in the area delimited by a given pixel. 
-
-
-
-https://gisgeography.com/spectral-signature/
-
-landsat bands: https://www.gisagmaps.com/landsat-band-designations/
-
+* Get some practice extracting and working with datasets derived from (MODIS) satellite imagery in R Studio
+  * One section on NDVI
+  * One section on land cover
+* Exploring Google Earth Engine
 
 
