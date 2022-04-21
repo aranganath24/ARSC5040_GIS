@@ -38,6 +38,8 @@ MODIStsp(gui             = FALSE,
          out_format      = "GTiff")
 
 
+setwd("~/Documents/git_repositories/ARSC5040_GIS/general_resources")
+filepath<-"land_cover/colorado.shp"
 
 
 

@@ -1,0 +1,367 @@
+---
+title: "Working with the Normalized Difference Vegetation Index (NDVI) and Land Cover Data in R Studio"
+author: "Aditya Ranganath"
+date: "4/20/2022"
+output: 
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+    number_sections: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Preliminaries
+
+Please load the following packages: 
+
+```{r, message=F, warning=F, results=F}
+library(MODIStsp)
+library(sf)
+library(tidyverse)
+library(tmap)
+library(tidycensus)
+library(raster)
+library(exactextractr)
+library(terra)
+```
+
+
+```{r, echo=F, warning=F}
+library(DT) 
+```
+
+
+In order to extract data using the *MODIStsp* package, you must establish EARTHDATA credentials, which you can do on this [page](https://urs.earthdata.nasa.gov/home). 
+
+To find MODIS product codes (which you will need to specify the data you wish to extract), please see this page on MODIS [data products](https://modis.gsfc.nasa.gov/data/dataprod/). 
+
+# Introduction
+
+Earlier in class, we developed the intuition for how raster datasets that inform us about land use activities on the surface of the earth are created using multi-spectral satellite images, which allow us to exploit our knowledge of the different spectral properties of various objects to classify pixels. 
+Now that you have this intuition, we'll learn how to extract and work with some of these satellite-derived raster data products in R. Then, we'll do a walk-through of Google Earth Engine, and get you oriented to that interface.  
+
+# NDVI
+
+In this section, we'll learn how to extract an NDVI raster from MODIS, and visualize it in R Studio.
+
+## Download data from Modis
+
+We will use the *MODIStsp* package to download an NDVI raster for the state of Colorado directly to our working directory. 
+
+First, though, let's use *tidycensus* to extract a polygon for Colorado; we'll use this extent to specify the desired extent of our NDVI raster when we use the ```MODIStsp()``` function to extract our data. 
+
+```{r, message=F, results=F, warning=F}
+# Extract CO state polygon in WGS84 CRS using tidycensus; assign to object named "co_polygon)
+co_polygon<-get_decennial(geography = "state",
+                               variables = "P001001",
+                               year = 2010,
+                               geometry=TRUE) %>% 
+  filter(NAME=="Colorado") %>% 
+  st_transform(4326)
+```
+
+Let's now download this polygon. First, make a new folder on your computer named "MODIS_data" and set your working directory to this folder. Within this "MODIS_data" folder, make two new subfolders, with one named "vegetation" and the other named "land_cover". Now, let's download `the```co_polygon``` to our "vegetation" folder, using the ```st_write()``` function:
+
+```{r, eval=F}
+# Writes "co_polygon" to the "vegetation" folder as "colorado.shp"
+st_write(co_polygon, "vegetation/colorado.shp")
+```
+
+In the code above, the first argument to ```st_write()``` is the name of the object we want to write to disk, while the second argument (```"vegetation/colorado.shp"```) specifies that we want the file to be named "colorado", and saved as a shapefile (a type of file format commonly used to store vector data, which uses the ".shp" file extension) to the "vegetation" folder of our working directory. 
+
+Now, let's go to the [MODIS NDVI products](https://modis.gsfc.nasa.gov/data/dataprod/mod13.php) page, and extract some information about the "Vegetation Indices 16-Day L3 Global 250m" dataset; we use a "*" in between the "M" and "D" to indicate we want to extract information for both the "Terra" and "Aqua" products: 
+
+```{r attr.output='style="max-height: 200px;"'}
+MODIStsp_get_prodlayers("M*D13Q1")
+```
+
+We'll now use some of this information to extract our NDVI raster, using the ```MODIStsp()``` function:
+
+```{r, eval=F}
+MODIStsp(
+  gui = FALSE, # specifies we don't want to work with a GUI
+  out_folder = "vegetation", # specifies the folder to which we want to write our data
+  selprod = "Vegetation_Indexes_16Days_1Km (M*D13A2)", # specifies the name of the product to extract
+  bandsel = "NDVI", # specifies the band we want to extract
+  user = "YOUR EARTHDATA USERNAME", # enter your EARTHDATA username
+  password = "YOUR EARTH DATA PASSWORD", # enter your earthdata 
+  start_date = "2020.07.03", # Date for which we want the data
+  end_date = "2020.07.03",
+  output_proj = 4326, # CRS of raster
+  verbose = FALSE, # suppresses processing messages
+  spatmeth = "file", # clips raster to extent using file on disk
+  spafile = "vegetation/colorado.shp", # specifies file to use for clipping
+  out_format = "GTiff" # specifies output raster file format
+)
+```
+
+Above, note that we use the same start data and end date (2020.07.03), so this data corresponds to that day in July; since we're interested in viewing the spatial distribution of live vegetation, it makes sense to pick a day during peak-summer. 
+
+Now, let's load our extracted raster into R Studio. Within the "vegetation" subdirectory within your "MODIS_data" folder, you'll see a new folder named "Colorado". Click on "Colorado", then click on a folder named "VI_16Days_1Km_v6", followed by "NDVI"; within that NDVI folder, you'll see a raster dataset (in .tif format) named "MYD13A2_NDVI_2020_185"; that's the NDVI raster you'll want to load into R. In short: 
+```"modis_data" --> "vegetation" --> "Colorado" --> "VI_16Days_1Km_v6" --> "NDVI" --> "MYD13A2_NDVI_2020_185.tif"```. 
+
+Set your working directory to the "NDVI" folder, load the raster into R using the ```raster()``` function, and assign it to an object named ```CO_ndvi``` as below: 
+
+```{r, echo=-1}
+setwd("/Users/adra7980/Documents/git_repositories/ARSC5040_GIS/class_notes/class4/modis_data/vegetation/colorado/VI_16Days_1Km_v6/NDVI")
+# Loads NDVI raster into R Studio and assigns it to an object named "CO_ndvi"
+CO_ndvi<-raster("MYD13A2_NDVI_2020_185.tif")
+```
+
+Go ahead and print the raster metadata:
+
+```{r}
+# prints "CO_ndvi" metadata
+CO_ndvi
+```
+
+Note the minimum and maximum values (-32768, 32767), which look strange; recall that NDVI values range from -1 to 1. The issue is that the raw raster values need to be adjusted by a scale factor to recover the correct NDVI values. This scale factor is 0.0001, and is provided in the data product's metadata (available [here](https://lpdaac.usgs.gov/products/mod13a2v006/); see the "Layers" tab).
+
+To make this adjustment, we can take ```CO_ndvi``` and simply multiply by the scale factor, 0.0001; we'll assign the rescaled raster to a new object named ```CO_ndvi_adjusted```:
+
+```{r}
+# applies scale adjustment to "CO_ndvi" and assigns to new object named "CO_ndvi_adjusted"
+CO_ndvi_adjusted<-CO_ndvi*0.0001
+```
+
+Now, let's print the raster metadata for ```CO_ndvi_adjusted```:
+
+```{r}
+# prints "CO_ndvi_adjusted" metadata
+CO_ndvi_adjusted
+```
+
+Note the values range from -0.1909 to 0.8979, which is reasonable, given our knowledge of the NDVI index. 
+
+Recall that it's always possible to view a raster's underlying data by converting the raster object to a dataframe. Below, we'll convert ```CO_ndvi_adjusted``` to a dataframe and assign it to a new object named ```CO_ndvi_adjusted_df```:
+
+```{r}
+# makes data frame from "CO_ndvi_adjusted" and assigns to new object named "CO_ndvi_adjusted_df"
+CO_ndvi_adjusted_df <- as.data.frame(CO_ndvi_adjusted, xy=T)
+```
+
+Now, you can view the underlying data in the R Studio data viewer by passing ```CO_ndvi_adjusted_df``` to the ```View()``` function:
+
+```{r}
+# Views "CO_ndvi_adjusted_df" in data viewer
+View(CO_ndvi_adjusted_df)
+```
+
+And, as we learned in the previous class, we can easily view the distribution of these NDVI values using ```ggplot2()```. Below, we'll make a histogram based on the NDVI values (stored in the "MYD13A2_NDVI_2020_185" column of ```CO_ndvi_adjusted_df```):
+
+```{r}
+ggplot()+
+  geom_histogram(data=CO_ndvi_adjusted_df, 
+                 aes(MYD13A2_NDVI_2020_185), 
+                 bins=25)
+```
+
+Now, to get a sense of how these values varied across space on that summer day in Colorado, let's go ahead and plot the raster using *tmap*, using a Yellow-to-Green color palette. We'll assign our map to a new object named ```CO_ndvi_map```:
+
+```{r, warning=F, message=F}
+CO_ndvi_map<-tm_shape(CO_ndvi_adjusted)+ # declares object to map
+                tm_raster(palette = "YlGn", # sets palette
+                          style="cont", # sets legend breaks to continuous
+                          breaks=c(-0.2, 0,0.2,0.4,0.6,0.8, 1), # specifies vector of legend breaks
+                          title="Normalized Difference\nVegetation Index\n(NDVI)")+ # legend title
+                tm_layout(legend.outside=T, # puts legend outside map extent
+                          legend.title.size=0.7, # sets legend title size
+                          main.title="Summer Vegetation in Colorado, 7/3/2020", # sets main title
+                          main.title.size=0.8, # sets main title size
+                          attr.outside=T)+ # puts credits outside map extent
+  tm_credits("Map Author: Aditya Ranganath\nData Source: MODIS", # credits text
+             position=c(0.78,0),  # sets credits position
+             size=0.38) # sets credits size
+```
+
+Now, let's print our map to see what it looks like:
+
+```{r}
+# prints "CO_ndvi_map"
+CO_ndvi_map
+```
+
+It can be instructive to plot this in interactive mode. Let's first switch the *tmap* mode to "view":
+
+```{r}
+tmap_mode("view")
+```
+
+```{r}
+# prints map in "view" mode
+CO_ndvi_map
+```
+
+```{r, echo=F}
+tmap_mode("plot")
+```
+
+Zoom into an area with high concentrations of vegetation; then, turn off the NDVI layer and turn on the "ESRI.WorldTopoMap"; you'll notice that these concentrations are in National Forest areas, which is what we would expect. 
+
+# Land use
+
+Let's get some more practice working with MODIS data by working with a land cover raster. Just like the NDVI, land cover rasters are created by taking satellite imagery (generated by the MODIS sensor, in this case) and applying our knowledge of the different spectral signatures of different land cover classes to classify pixels according to their land cover type (in the example we'll work with, a pixel is classified as belonging to a given land cover class if that land class covers the majority of the pixel/grid cell). 
+
+First, take a look at the MODIS landing page for land cover products, at this [link](https://lpdaac.usgs.gov/products/mcd12q1v006/). 
+
+Using the product code presented on that page ("MCD12Q1"), let's extract some relevant metadata in R, using that code:
+
+```{r attr.output='style="max-height: 200px;"'}
+MODIStsp_get_prodlayers("MCD12Q1")
+```
+
+
+Now, let's make sure our directories are set up correctly. Make sure to switch your working directory back to the initial "modis_data" directory. You'll want to copy the Colorado vector data files ("Colorado.dbf", "Colorado.prj", "Colorado.shp", "Colorado.shx") into the "land_cover" folder (a subdirectory of "modis_data"). Alternatively, you can use the following to download ```co_polygon``` to the "land_cover" folder:
+
+```{r, eval=F}
+st_write(co_polygon, "land_cover/Colorado.shp")
+```
+
+Now that we have our clipping polygon in our desired colder, let's go ahead and  use the ```MODIStsp()``` function to extract the "LC1" band, which provides land cover classifications based on the International Geosphere-Biosphere Programme (IGBP) classification at 500 m resolution:
+
+```{r, eval=F}
+# Extracts land cover raster 
+MODIStsp(gui= FALSE, # specifies that we don't want the MODIS GUIS
+         out_folder = "land_cover", # specifies folder to extract data
+         selprod = "LandCover_Type_Yearly_500m (MCD12Q1)", # name of data product
+         bandsel = "LC1", # name of desired band
+         user = "YOUR EARTDATA USERNAME", # declare username
+         password = "YOUR EARTHDATA PASSWORD", # declare password
+         start_date = "2019.01.01", # set start date
+         end_date = "2019.12.31", # set end data
+         output_proj = 4326, # sets desired CRS
+         verbose = FALSE, # suppresses processing messages
+         spatmeth = "file", # clips raster to extent using vector file on disk
+         spafile = "land_cover/colorado.shp", # path to vector file defining raster extent
+         out_format = "GTiff") # specifies we want data as GeoTIFF
+```
+
+Compared to our earlier call to ```MODIStsp``` for the purpose of extracting the NDVI raster, you'll notice a few differences. This time, the output folder is "land_cover", rather than "vegetation" (which means that the "spafile" argument is now "land_cover/colorado.shp" rather than "vegetation/colorado.shp"), and the product name and corresponding band (defined in the "selprod" and "bandsel" arguments) are naturally also different, since we're extracting a different dataset. MODIS releases land cover data products at yearly intervals; by specifiying our start date at "2019.01.01" and our end date at "2019.12.31", we're effectively extracting the land cover raster that is based on data from 2019. The other arguments are unchanged from our earlier call. 
+
+Once that code has been run, the relevant band from "LandCover_Type_Yearly_500m (MCD12Q1)" should be extracted. To find it, go to your "modis_data" folder, and then go into the "land_cover" sub-folder. Within "land_cover", you'll see a sub-directory named "Colorado"; go ahead and click on that, and then 
+click on the "LandCover_Type_Yearly_500m_v6" folder. Within "LandCover_Type_Yearly_500m_v6", click on a sub-directory named "LC1", and you'll finally see the land cover dataset, named "MCD12Q1_LC1_2019_001.tif". In short, the path to your raster can be diagrammed as follows: ```modis_data" --> "land_cover" --> "colorado" --> "LandCover_Type_Yearly_500m_v6" --> "LC1" --> MCD12Q1_LC1_2019_001.tif```. 
+
+Go ahead and set your working directory to the "LC1" folder containing the raster, and then read it in and assign it to a new object named ```CO_land_cover```:
+
+```{r, echo=-1}
+setwd("/Users/adra7980/Documents/git_repositories/ARSC5040_GIS/class_notes/class4/modis_data/land_cover/colorado/LandCover_Type_Yearly_500m_v6/LC1")
+# read in land use raster
+CO_land_cover<-raster("MCD12Q1_LC1_2019_001.tif")
+```
+
+[User guide](https://lpdaac.usgs.gov/documents/101/MCD12_User_Guide_V6.pdf) 
+
+```{r}
+raster_map_label<-c("Evergreen needleleaf forests",
+                    "Evergreen broadleaf forests",
+                    "Deciduous needleleaf forests",
+                    "Deciduous broadleaf forests",
+                    "Mixed forests",
+                    "Closed shrublands",
+                    "Open shrublands",
+                    "Woody savannas",
+                    "Savannas",
+                    "Grasslands",
+                    "Permanent wetlands",
+                    "Croplands",
+                    "Urban and built-up lands",
+                    "Cropland/natural vegetation mosaics",
+                    "Permanent Snow and ice",
+                    "Barren",
+                    "Water bodies")
+```
+
+```{r}
+CO_landcover_tmap<-tm_shape(CO_land_cover)+
+                    tm_raster(breaks=c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18),
+                              labels=raster_map_label, 
+                              palette="Set1",
+                              title="Colorado Land Cover, 2019")+
+                      tm_legend(outside=T)
+```
+
+```{r}
+CO_landcover_tmap
+```
+
+## Classifying counties by landcover
+
+```{r, results=F, warning=F}
+ co_counties<-get_decennial(geography = "county",
+                            state="CO",
+                            variables = "P001001",
+                            year = 2010,
+                            geometry=TRUE) %>% 
+                st_transform(4326)
+```
+
+```{r, results=F, warning=F}
+county_land_cover_majority_zonal<-exact_extract(CO_land_cover, co_counties, fun="majority")
+```
+
+```{r}
+county_land_cover_majority<-cbind(co_counties, county_land_cover_majority_zonal)
+```
+
+Count number of grid cells for each class in each county
+
+```{r, results=F, warning=F}
+county_land_cover_zonal<-exact_extract(CO_land_cover, co_counties)
+```
+
+```{r}
+county_land_cover_zonal_final<-bind_rows(county_land_cover_zonal, .id = "id")
+```
+
+```{r}
+county_landclass_distribution<-county_land_cover_zonal_final %>% 
+                      group_by(id, value) %>% 
+                      count()
+```
+
+```{r}
+county_landclass_distribution$id<-as.integer(county_landclass_distribution$id)
+```
+
+```{r}
+county_landclass_distribution<-county_landclass_distribution %>% 
+                                rename(land_class=value)
+```
+
+
+```{r}
+county_landclass_distribution<-county_landclass_distribution %>% arrange(id)
+```
+
+```{r}
+co_counties<-co_counties %>% 
+              rowid_to_column(var="id")
+```
+
+```{r}
+county_landclass_distribution_final<-left_join(county_landclass_distribution, co_counties, by="id" )
+```
+
+```{r, echo=F}
+county_landclass_distribution_final_head<-head(county_landclass_distribution_final, n=50)
+
+county_landclass_distribution_final_head %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 1)
+))
+```
+
+
+
+
+
+
+[https://lpdaac.usgs.gov/documents/101/MCD12_User_Guide_V6.pdf](https://lpdaac.usgs.gov/documents/101/MCD12_User_Guide_V6.pdf)

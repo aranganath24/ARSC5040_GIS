@@ -15,7 +15,8 @@ MODIStsp(gui             = FALSE,
 
 
 
-
+setwd("~/Documents/git_repositories/ARSC5040_GIS/general_resources")
+filepath<-"VegetationData/colorado.shp"
 
 MODIStsp(
   gui = FALSE,

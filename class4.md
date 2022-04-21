@@ -61,4 +61,6 @@ A link to the class notes will be available here soon after the class session.
 
 ## Assignment
 
+[test](class_notes/class4/rs_presentation/rs_gee_presentation.html)
+[test2](class_notes/class4/nvdi_landuse/nvdi_landuse.html)
 
