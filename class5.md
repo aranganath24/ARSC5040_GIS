@@ -49,10 +49,10 @@ doi: [https://doi.org/10.1177/2053951716661366](https://doi.org/10.1177/20539517
 
 ## Class notes
 
-A link to the class notes will be available here soon after the class session. 
+Presentation slides are available at this [link](class_notes/class5/presentation/class5_presentation.html)
 
 ## Useful resources
 
-## Assignment
+
 
 
