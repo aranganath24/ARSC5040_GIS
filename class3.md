@@ -47,15 +47,15 @@ doi: [https://doi.org/10.1177/0738894216659843](https://doi.org/10.1177/07388942
 
 * Dell, Melissa. 2010. "The Persistent Effects of Peru's Mining Mita". *Econometrica* 78(6): 1863-1903. 
 
-## Class notes/tutorial
+## Class Notes/Tutorial
 
-The tutorial for this class is available [here](class_notes/class3/raster_analysis.html). 
+* [Class 3 tutorial](class_notes/class3/raster_analysis.html). 
 
 ## Useful resources
 
-* Documentation for the [exactextractr](https://cran.r-project.org/web/packages/exactextractr/readme/README.html) package, which implements zonal statistics.
-* Documentation for the [terra](https://cran.r-project.org/web/packages/terra/index.html) package, which is becoming the "go-to" package for handling raster data in R. 
-* A useful set of tutorials on the *terra* package, focusing on applied examples, is available [here](https://rspatial.org/terra/#google_vignette). 
+* [Documentation for the exactextractr package](https://cran.r-project.org/web/packages/exactextractr/readme/README.html), which implements zonal statistics.
+* Documentation for the [*terra*](https://cran.r-project.org/web/packages/terra/index.html) package, which is becoming the "go-to" package for handling raster data in R. 
+* A useful set of [tutorials on the *terra* package](https://rspatial.org/terra/#google_vignette), focusing on applied examples. 
 * The raster data used in the tutorial is from the [WorldPop](https://www.worldpop.org/) project, which contains a lot of interesting raster datasets. In addition, the [rspatialdata](https://rspatialdata.github.io/index.html) project offers accessible tutorials on various R packages that streamline the process of extracting raster datasets. It includes coverage of packages that facilitate the extraction of land cover, elevation, temperature, rainfall, humidity, vegetation, and air pollution rasters. Please see the [General Resources](resources.md) page for more raster data sources. 
 
 ## Assignment

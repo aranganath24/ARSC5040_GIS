@@ -53,15 +53,15 @@ doi: [https://doi.org/10.1177/0263775815608851](https://doi.org/10.1177/02637758
 * Gorelick, Noel, Matt Hancher, Mike Dixon, Simon Ilyushchenko, David Thau, and Rebecca Moore. 2017. “Google Earth Engine: Planetary-scale geospatial analysis for everyone.” *Remote Sensing of Environment* 202(1): 18-27.\
 [https://doi.org/10.1016/j.rse.2017.06.031](https://doi.org/10.1016/j.rse.2017.06.031) 
 
-## Class notes and tutorial
+## Class Notes/Tutorial
 
-* The Class 4 tutorial is available [here](class_notes/class4/nvdi_landuse/nvdi_landuse.html).
-* Class 4 slides are available [here](class_notes/class4/rs_presentation/rs_gee_presentation.html). 
+* [Class 4 tutorial](class_notes/class4/nvdi_landuse/nvdi_landuse.html)
+* [Class 4 slides](class_notes/class4/rs_presentation/rs_gee_presentation.html) 
 
 ## Useful resources
 
 * There are a number of very good video tutorials on using Google Earth Engine. The best place to start is this [webinar](https://www.youtube.com/watch?v=oAElakLgCdA), presented by Stace Maples of the Stanford Geospatial Center.
-* If you plan to do a lot of work with Earth Engine, and you are more comfortable using R than using JavaScript, you should checkout the newly developed [RGEE](https://github.com/r-spatial/rgee) package, which allows you to work with GEE data (and leverage the platform's computational resources) from your desktop's R Studio application. It can sometimes be a little challenging to install, but once it's set up, it's very nice to work with.  I found this [video](https://www.youtube.com/watch?v=_fDhRL_LBdQ) to be a helpful RGEE installation guide. Looking through this  [repository](https://csaybar.github.io/rgee-examples/#Introduction) of RGEE scripts is a great way to start learning the package. 
+* If you plan to do a lot of work with Earth Engine, and you are more comfortable using R than using JavaScript, you should checkout the newly developed [RGEE](https://github.com/r-spatial/rgee) package, which allows you to work with GEE data (and leverage the platform's computational resources) from your desktop's R Studio application. It can sometimes be a little challenging to install, but once it's set up, it's very nice to work with.  I found this [video](https://www.youtube.com/watch?v=_fDhRL_LBdQ) to be a helpful RGEE installation guide. Looking through this  [repository](https://csaybar.github.io/rgee-examples/#Introduction) of RGEE scripts is a great way to start learning the RGEE package. 
 * The official Google Earth Engine [documentation](https://developers.google.com/earth-engine/guides) page contains a number of useful guides and tutorials. 
 
 ## Assignment

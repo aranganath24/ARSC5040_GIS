@@ -47,11 +47,14 @@ doi: [https://doi.org/10.1257/jep.34.1.196](https://doi.org/10.1093/isq/sqx046 )
 * Leszczynski, Agnieszka and Jeremy Crampton. 2016. “Introduction: Spatial Big Data and everyday life.” *Big Data and Society*: 1-6.\
 doi: [https://doi.org/10.1177/2053951716661366](https://doi.org/10.1177/2053951716661366)
 
-## Class notes
+## Class Notes/Tutorial
 
-Presentation slides are available at this [link](class_notes/class5/presentation/class5_presentation.html)
+* [Class 5 Presentation slides](class_notes/class5/presentation/class5_presentation.html)
+* Optional [tutorial on GIS scripting in R](class_notes/class5/scripting_tools.html)
 
 ## Useful resources
+
+* [Causal Inference: The Mixtape](https://mixtape.scunning.com) by Scott Cunningham
 
 
 

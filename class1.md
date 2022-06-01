@@ -37,13 +37,10 @@ doi: [https://doi.org/10.1146/annurev-polisci-031710-112604](https://doi.org/10.
 
 * Behm, Dayna, Tony Bryan, Joshua Lordemann, and Steven R. Thomas. 2018. "The Past, Present and Future of Geospatial Data Use: Exploring the uses of geospatial data in retail, health care, financial services, and transportation/logistics." February 1, 2018. [https://trajectorymagazine.com/past-present-future-geospatial-data-use/](https://trajectorymagazine.com/past-present-future-geospatial-data-use/)
 
-## Class notes
 
-A link to the class notes will be available here soon after the class session. 
+## Class Notes/Tutorial
 
-## Class Tutorial
-
-The tutorial for Class One is available [here](class_notes/Class1/class1_maps.html). 
+* [Class 1 Tutorial](class_notes/Class1/class1_maps.html)
 
 ## Useful resources
 
