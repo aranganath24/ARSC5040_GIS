@@ -950,7 +950,7 @@ Now, let's take a look at our distance Matrix, which provides information on the
 View(boulder_hospital_distancematrix)
 ```
 
-```{r}
+```{r, echo=F}
 boulder_hospital_distancematrix %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
   deferRender = TRUE,
   scrollY = 350,
@@ -1060,7 +1060,7 @@ To find the smallest value for each column (which yields the distance to the clo
 FIRESTATION_closest_hospital<-apply(boulder_hospital_firstation_distancematrix_df, 2, FUN=min)
 ```
 
-```{r, echo=F}
+```{r}
 FIRESTATION_closest_hospital<-as.data.frame(FIRESTATION_closest_hospital)
 ```
 
@@ -1070,7 +1070,7 @@ Let's view these datasets:
 View(HOSPITAL_closest_fire_station)
 ```
 
-```{r}
+```{r, echo=F}
 HOSPITAL_closest_fire_station %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
   deferRender = TRUE,
   scrollY = 350,
@@ -1086,7 +1086,7 @@ HOSPITAL_closest_fire_station %>% datatable(extensions=c("Scroller", "FixedColum
 View(FIRESTATION_closest_hospital)
 ```
 
-```{r}
+```{r, echo=F}
 FIRESTATION_closest_hospital %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
   deferRender = TRUE,
   scrollY = 350,
