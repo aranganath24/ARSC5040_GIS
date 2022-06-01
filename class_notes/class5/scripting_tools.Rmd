@@ -584,7 +584,7 @@ Even after naming the list, we can continue referring to the list elements by th
 geography_stop_list[[3]]
 ```
 
-```{r}
+```{r, echo=F}
 geography_stop_list[[3]] %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
   deferRender = TRUE,
   scrollY = 350,

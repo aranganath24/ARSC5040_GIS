@@ -470,7 +470,7 @@ Let's take a look at the dataset we just created:
 View(county_landclass_distribution)
 ```
 
-```{r}
+```{r, echo=F}
 head(county_landclass_distribution, n=40) %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
   deferRender = TRUE,
   scrollY = 350,

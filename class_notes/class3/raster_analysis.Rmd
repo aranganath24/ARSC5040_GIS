@@ -558,7 +558,7 @@ nyc_2019_boroughs_population<-cbind(nyc_boroughs_4326, nyc_boroughs_population_z
 View(nyc_2019_boroughs_population)
 ```
 
-```{r}
+```{r, echo=F}
 nyc_2019_boroughs_population %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
   deferRender = TRUE,
   scrollY = 350,
